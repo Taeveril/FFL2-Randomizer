@@ -6,6 +6,7 @@
 
 ### How to:
 - Download the Python scripts (and install Python if you don't have it).
+- Run FFL2R.py
 - Will prompt for a GB ROM and seed.
 - Will shuffle treasures and MAGI and output a ROM of its own.
 
