@@ -1,8 +1,8 @@
 ## Final Fantasy Legend 2 Randomizer
 
-### Version 0.1.0 (5/21/2025):
+### Version 0.1.1 (5/22/2025):
 
-- Initial commit that shuffles treasures and MAGI.
+- Cleaned up some usability issues (Thanks Destil!).
 
 ### How to:
 - Download the Python scripts (and install Python if you don't have it).
