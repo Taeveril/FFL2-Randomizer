@@ -1,18 +1,27 @@
 import binascii
 import random
 import FFL2R_data
+from tkinter import Tk
+from tkinter.filedialog import askopenfilename
 
+Tk().withdraw()
+gameFile = askopenfilename(title="First, please point to the FFL2 rom.")
 
 i = 0
 j = 0
 k = 0
 romData = {}
-gameFile = input("First, please point to the FFL2 rom. (No quotes)")
-gameSeed = int(input("And now a seed please. Blank will generate a random number."))
 
-gameSeed = abs(gameSeed)
+#  seeding
+gameSeed_str = str(input("And now a seed please. Blank will generate a random number."))
+try:
+    gameSeed=int(gameSeed_str)
+    gameSeed = abs(gameSeed)
+except:
+    gameSeed = random.randint(0, 4294967296)
+random.seed()
 print("Seed is: " + str(gameSeed))
-random.seed(gameSeed)
+
 
 with open(gameFile, 'rb') as f:
     hexData = binascii.hexlify(f.read())
