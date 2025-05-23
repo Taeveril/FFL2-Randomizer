@@ -128,8 +128,6 @@ class GameData:
     ]
 
     treasureAddresses = [
-        #TrueEye Chest Not Included.
-        #It's a fake chest that toggles a script to reveal the light cave.
         "0001C8F3",
         "0001C8F9",
         "0001C8FF",
@@ -422,3 +420,50 @@ class GameData:
         "0002AB07", # 0002AB5B
         "0002AB2F"  # 0002AB61
         ]
+
+    newItemPrices = [
+        #prices are stored in three hex, addresses read right to left.
+        { "0003F929" : b"10" },  #stat boosting potions, changed to 10k each up from 1k
+        { "0003F92A" : b"27" },
+        { "0003F92B" : b"00" },
+        { "0003F92C" : b"10" },
+        { "0003F92D" : b"27" },
+        { "0003F92E" : b"00" },
+        { "0003F92F" : b"10" },
+        { "0003F930" : b"27" },
+        { "0003F931" : b"00" },
+        { "0003F932" : b"10" },
+        { "0003F933" : b"27" },
+        { "0003F934" : b"00" },
+        { "0003F9DA" : b"50" }, #selfix, changed to 50,000
+        { "0003F9DB" : b"C3" },
+        { "0003F9DC" : b"00" },
+        { "0003F9DD" : b"D1" }, #seven sword, changed to 77,777
+        { "0003F9DE" : b"2F" },
+        { "0003F9DF" : b"01" }
+        ]
+
+    # 3F9E0-3F9E7 - First Town, Weapon Shop
+    # 3F9E8-3F9EF - Desert Town, Weapon Shop
+    # 3F9F0-3F9F7 - Ashura Town, Weapon Shop
+    # 3F9F8-3F9FF - Giant Town, Weapon Shop
+    # 3FA00-3FA07 - Second Town, Weapon Shop
+    # 3FA08-3FA0F - Apollo Town, Weapon Shop
+    # 3FA10-3FA17 - Lynn Town, Weapon Shop
+    # 3FA18-3FA1F - Guardian Town, Weapon Shop
+    # 3FA20-3FA27 - Venus Town, Weapon Shop
+    # 3FA28-3FA2F - Race Town, Weapon Shop 
+    # 3FA30-3FA37 - Edo Town, Weapon Shop
+    # 3FA38-3FA3F - Final Town, Weapon Shop
+    # 3FA40-3FA47 - First Town, Item Shop
+    # 3FA48-3FA4F - Desert Town, Item Shop
+    # 3FA50-3FA57 - Giant Town, Item Shop 
+    # 3FA58-3FA5F - Apollo Town, Item Shop
+    # 3FA60-3FA67 - Guardian Town, Item Shop
+    # 3FA68-3FA6F - Venus Town, Item Shop
+    # 3FA70-3FA77 - Race Town, Item Shop
+    # 3FA78-3FA7F - Edo Town, Item Shop
+    # 3FA80-3FA87 - Final Town, Item Shop
+    # 3FA88-3FA8F - Recurring Item Shop (Second Town, Ashura Town, etc.)
+    # 3FA90-3FA97 - Echigoya
+    # 3FA98-3FA9F - Giant Town Giant Gear Seller

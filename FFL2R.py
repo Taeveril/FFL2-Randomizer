@@ -12,9 +12,6 @@ def main(rom_path:str|None, seed:int|None):
     else:
         gameFile = rom_path
 
-    i = 0
-    j = 0
-    k = 0
     romData = {}
 
     #  seeding
@@ -33,6 +30,7 @@ def main(rom_path:str|None, seed:int|None):
     with open(gameFile, 'rb') as f:
         hexData = binascii.hexlify(f.read())
 
+    i = 0
     # init of address with hex
     while i*2 < len(hexData):
         # script patching-in code
@@ -87,25 +85,34 @@ def main(rom_path:str|None, seed:int|None):
         i+=1
 
     game = FFL2R_data.GameData
-
+    
     random.shuffle(game.treasures)
 
+
+    j=0
     for address in game.treasureAddresses:
         romData.update({ address : game.treasures[j] })
+        if game.treasures[j] == b"FF":
+            k = "{:08X}".format(int("0x" + address,16)-2)
+            romData[k] = bytes(hex(int(romData[k], 16)+64)[2:].upper(), encoding='utf-8')
         j+=1
 
     random.shuffle(game.magi)
-
+    j=0
     for address in game.magiAddresses:
-        romData.update ({ address : game.magi[k] })
+        romData.update({ address : game.magi[j] })
+        #race MAGI duplication
         if address == "0002AB55":
-            romData.update ({ "0002AAE0" : game.magi[k] })
+            romData.update ({ "0002AAE0" : game.magi[j] })
         elif address == "0002AB5B":
-            romData.update ({ "0002AB07"  : game.magi[k] })
+            romData.update ({ "0002AB07"  : game.magi[j] })
         elif address == "0002AB61":
-            romData.update ({"0002AB2F" : game.magi[k] })
-        k+=1
+            romData.update ({"0002AB2F" : game.magi[j] })
+        j+=1
     
+    for prices in game.newItemPrices:
+        romData.update(prices)
+
     with open('Final Fantasy Legend 2 - ' + str(gameSeed) + '.gb', 'xb') as f:
         for key, value in romData.items():
             f.write(binascii.unhexlify(value))
