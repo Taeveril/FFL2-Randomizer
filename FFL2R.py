@@ -113,9 +113,6 @@ def main(rom_path:str|None, seed:int|None):
     for prices in game.newItemPrices:
         romData.update(prices)
 
-    print(game.treasures)
-    print(game.magi)
-
     with open('Final Fantasy Legend 2 - ' + str(gameSeed) + '.gb', 'xb') as f:
         for key, value in romData.items():
             f.write(binascii.unhexlify(value))
