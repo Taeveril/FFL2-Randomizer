@@ -1,5 +1,8 @@
 ## Final Fantasy Legend 2 Randomizer
 
+### Version 0.1.3 (5/24/2025):
+- Fixed issue with seeding not producing consistent results
+
 ### Version 0.1.2 (5/23/2025):
 
 - Treasure Chests, if empty, will be open.
