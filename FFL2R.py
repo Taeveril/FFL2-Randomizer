@@ -22,7 +22,7 @@ def main(rom_path:str|None, seed:int|None):
             gameSeed = abs(gameSeed)
         except:
             gameSeed = random.randint(0, 4294967296)
-        random.seed()
+        random.seed(gameSeed)
     else:
         gameSeed = seed
     print("Seed is: " + str(gameSeed))
@@ -112,6 +112,9 @@ def main(rom_path:str|None, seed:int|None):
     
     for prices in game.newItemPrices:
         romData.update(prices)
+
+    print(game.treasures)
+    print(game.magi)
 
     with open('Final Fantasy Legend 2 - ' + str(gameSeed) + '.gb', 'xb') as f:
         for key, value in romData.items():
