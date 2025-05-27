@@ -1,0 +1,62 @@
+Tiers	ARMOR
+1 	Bronze armor, Bronze gloves, Bronze helm, Bronze shield
+2	Silver armor, Kimono, Silver gloves, Silver helm, Silver shield
+3	Gold armor, Army armor, Gold gloves, Gold helm, Gold shield
+4	Giant armor, Geta, Giant gloves, Army helm		
+5	Dragon armor, Hermes, Giant helm, Flame shield, Ice shield
+6	Battle armor, Hecate, Ninja gloves, Dragon helm, Dragon shield, Samurai shield
+*	Arthur, Parasuit, Selfix		
+
+Tiers	STR Weapons
+1	Hammer, Long sword
+2	Axe, Battle sword, Abacus
+3	Katana, Gold sword, Temptat
+4	Thunder axe, Flame sword, Ice sword, Ogre axe, Coral sword
+5	Rune axe, Sypha, Dragon sword, Revenge sword
+6	Defend sword, Muramas, Sun sword 
+*	Seven sword, Gungnir, XCalibr, Glass sword
+
+Tiers	AGI Weapons
+1	Bow, Whip
+2	Rapier
+3	Blitz whip, Gold bow
+4	Sabre
+5	Laser sword
+6	CatClaw
+*	Samurai bow
+
+Tiers 	Martial Arts
+1	Punch
+2	Kick
+3	Headbutt
+4	Counter
+5	X-Kick
+6	Jyudo
+*	Karate
+
+Tiers	Magic Weapons
+1	Psi knife, Sleep book
+2	Cure book, Fire book, Ice book, Thunder book, Fog book
+3	Prayer book, Stone book 
+4	Heal staff, Psi sword
+5	Death book, Mage staff
+6	Flare, Wizard staff 
+*	Psi gun, Vampic sword
+
+Tiers Guns and Cannons
+1	Colt, Stungun, Coin, 
+2	Musket, Rocket
+3	SMG, Fire gun, Missile
+4	Grenade, Bazooka
+5	Magnum, Vulcan
+6	Laser gun, Tank
+*	NukeBomb, Hyper
+
+Tiers Items
+1	Cure, Curse, EyeDrop, Soft
+2	Cure, Curse, EyeDrop, Soft
+3	Cure, X-Cure, Curse, EyeDrop, Soft
+4	X-Cure, Curse, EyeDrop, Soft, Door
+5	X-Cure, Curse, EyeDrop, Soft, Tent, Door, SpeedUp
+6	Elixier, Tent, Door, SpeedUp
+*	Power, Speed, Magic, Body
