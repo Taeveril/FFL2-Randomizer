@@ -1,5 +1,8 @@
 ## Final Fantasy Legend 2 Randomizer
 
+## Version 0.1.4 (5/27/2025:
+- Shop rando is completed.
+
 ### Version 0.1.3 (5/24/2025):
 - Fixed issue with seeding not producing consistent results
 
