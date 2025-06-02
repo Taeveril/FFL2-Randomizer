@@ -359,6 +359,8 @@ class GameData:
         0x1d928,
         0x1d92e,
         0x1e171,
+        # Addresses from 20000-2EB7F could be affected with any scripting changes
+        # as these addresses are MAGI rewarded via script.
         0x2892a, # Ki Assistant
         0x2913a, # Dad Giant World
         0x29454, # Apollo First
@@ -381,8 +383,8 @@ class GameData:
         0x2ba53, # Dunatis
         0x2ba56,	 
         0x2ba59,	 
-        0x2c233, # Opening.      Anything from 2C000-2EB7F onward will need to have addresses offset by how many scripts are added *2.
-        0x2caa6, # Ki's Body.    Current offset is 4.
+        0x2c233, # Opening.      
+        0x2caa6, # Ki's Body.    
         0x2caaf,
         0x2cab8,
         0x2cac1,
@@ -405,14 +407,14 @@ class GameData:
         0x2e9f3,
         0x2e9f6,
         0x2e9f9,
-        0x2e9fd, #Venus
+        0x2cc74, #Venus
+        0x2e9fd, 
         0x2ea00, 
         0x2ea03,
         0x2ea06,
         0x2ea09,
         0x2ea0c,
-        0x2ea0f,
-        0x2cc74
+        0x2ea0f
         ]
 
     #magiAddressesAlternate = [
