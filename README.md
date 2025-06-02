@@ -1,5 +1,9 @@
 ## Final Fantasy Legend 2 Randomizer
 
+### Version 0.3.0 (6/2/2025):
+- When you break a door locked by magi, it is permanent (will be optionized in the future). No more potentially getting stuck when Apollo steals your magi.
+- Slight code cleanup.
+
 ### Version 0.2.0 (5/27/2025):
 - Shop rando is completed (Thanks Treble!).
 
