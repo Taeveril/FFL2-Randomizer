@@ -3,8 +3,8 @@
 ### Version 0.3.1 (6/9/2025):
 - Further code cleanup.
 - Fixed some in-game bugs related to MAGI:
-+ Elemental MAGI all work how they're expected.
-+ Mana MAGI affinity has been enabled.
+  - Elemental MAGI all work how they're expected.
+  - Mana MAGI affinity has been enabled.
 
 ### Version 0.3.0 (6/2/2025):
 - When you break a door locked by magi, it is permanent (will be optionized in the future). No more potentially getting stuck when Apollo steals your magi.
