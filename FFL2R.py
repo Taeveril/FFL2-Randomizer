@@ -32,13 +32,13 @@ def main(rom_path:str|None, seed:int|None):
     with open(gameFile, 'rb') as f:
         hexData = binascii.hexlify(f.read())
 
-    romData = FFL2R_utils.create(romData, hexData)
-    romData = FFL2R_utils.scriptPatch(romData)
+    romData = FFL2R_utils.GameUtility.create(romData, hexData)
 
     romData = treasureShuffle(romData, FFL2R_data.GameData)
     romData = magiShuffle(romData, FFL2R_data.GameData)
     
-    romData = FFL2R_utils.safeUnlocks(romData)
+    romData = FFL2R_utils.GameUtility.safeUnlocks(romData)
+    romData = FFL2R_utils.GameUtility.magiFix(romData)
 
     for key, value in FFL2R_data.GameData.newItemPrices.items():
         romData.update({hex(key) : value})
@@ -51,55 +51,56 @@ def main(rom_path:str|None, seed:int|None):
 
     print ("Done!")
 
-def treasureShuffle(dict1, class1):
-    random.shuffle(class1.treasures)
+def treasureShuffle(rom:dict, data:FFL2R_data) -> dict:
+    random.shuffle(data.treasures)
     i=0
-    for address in class1.treasureAddresses:
-        dict1.update({ hex(address) : class1.treasures[i] })
-        if class1.treasures[i] == b"FF":
+    for address in data.treasureAddresses:
+        rom.update({ hex(address) : data.treasures[i] })
+        if data.treasures[i] == b"FF":
             j = hex(address - 0x2)
-            dict1[j] = bytes(hex(int(dict1[j], 16)+64)[2:].upper(), encoding='utf-8')
+            rom[j] = bytes(hex(int(rom[j], 16)+64)[2:].upper(), encoding='utf-8')
         i+=1
-    return dict1
+    return rom
 
-def magiShuffle(dict1, class1):
-    random.shuffle(class1.magi)
+def magiShuffle(rom:dict, data:FFL2R_data) -> dict:
+    rom = FFL2R_utils.GameUtility.scriptPatch(rom)
+    random.shuffle(data.magi)
     i=0
-    for address in class1.magiAddresses:
-        dict1.update({ hex(address) : class1.magi[i] })
+    for address in data.magiAddresses:
+        rom.update({ hex(address) : data.magi[i] })
         #race MAGI duplication
         if address == 0x2ab55:
-            dict1.update({ hex(174816) : class1.magi[i] }) #0x2aae0
+            rom.update({ hex(174816) : data.magi[i] }) #0x2aae0
         elif address == 0x2ab5b:
-            dict1.update({ hex(174855) : class1.magi[i] }) #0x2ab07
+            rom.update({ hex(174855) : data.magi[i] }) #0x2ab07
         elif address == 0x2ab61:
-            dict1.update({ hex(174895): class1.magi[i] }) #0x2ab2f
+            rom.update({ hex(174895): data.magi[i] }) #0x2ab2f
         i+=1
-    return dict1
+    return rom
 
-def shopShuffle(dict1, class1):
+def shopShuffle(rom:dict, data:FFL2R_data) -> dict:
     i=1
     while i <= 10:
         match i:
             #final town
             case 7:
                 a=0
-                t7 = list(class1.shopTiers[7])
+                t7 = list(data.shopTiers[7])
                 random.shuffle(t7)
                 while a < 8:
-                    dict1.update({hex(260736+a) : t7[a]})
+                    rom.update({hex(260736+a) : t7[a]})
                     a+=1
             #recurring
             case 8:
                 a=0
                 while a < 8:
-                    dict1.update({hex(260744+a) : class1.shopTiers[8][a]})
+                    rom.update({hex(260744+a) : data.shopTiers[8][a]})
                     a+=1
             #echigoya
             case 9:
                 echigoya = []
-                t0 = list(class1.shopTiers[0])
-                t7 = list(class1.shopTiers[7])
+                t0 = list(data.shopTiers[0])
+                t7 = list(data.shopTiers[7])
                 random.shuffle(t0)
                 random.shuffle(t7)
                 a = random.randint(0,5)
@@ -112,14 +113,14 @@ def shopShuffle(dict1, class1):
                     echigoya.append(t7[b])
                     b-=1
                 while c < 8:
-                    dict1.update({hex(260752+c) : echigoya[c]})
+                    rom.update({hex(260752+c) : echigoya[c]})
                     c+=1
             #giant town special
             case 10:
                 gianttown = []
-                t0 = list(class1.shopTiers[0])
-                t6 = list(class1.shopTiers[6])
-                t7 = list(class1.shopTiers[7])
+                t0 = list(data.shopTiers[0])
+                t6 = list(data.shopTiers[6])
+                t7 = list(data.shopTiers[7])
                 random.shuffle(t0)
                 random.shuffle(t6)
                 random.shuffle(t7)
@@ -138,18 +139,18 @@ def shopShuffle(dict1, class1):
                     c-=1
                 while d < 8:
                     if d+1 <= len(gianttown):
-                        dict1.update({hex(260760+d) : gianttown[d]})
+                        rom.update({hex(260760+d) : gianttown[d]})
                     else:
-                        dict1.update({hex(260760+d) : b"FF"})
+                        rom.update({hex(260760+d) : b"FF"})
                     d+=1
             case _:
                 addresses = []
-                for tierCheck in class1.shopAddresses:
+                for tierCheck in data.shopAddresses:
                     if tierCheck[0] == i:
                         addresses.append(tierCheck[1])
-                tier = list(class1.shopTiers[i])
-                t0 = list(class1.shopTiers[0])
-                nexttier = list(class1.shopTiers[i+1])
+                tier = list(data.shopTiers[i])
+                t0 = list(data.shopTiers[0])
+                nexttier = list(data.shopTiers[i+1])
                 random.shuffle(tier)
                 random.shuffle(t0)
                 t0 = t0[0:3]
@@ -159,13 +160,13 @@ def shopShuffle(dict1, class1):
                 positionTracker = 0
                 while totalItems > 0:
                     if len(tier) > 0:
-                        dict1.update({hex(addresses[currentShop]+positionTracker) : tier[0] })
+                        rom.update({hex(addresses[currentShop]+positionTracker) : tier[0] })
                         tier.pop(0)
                     elif len(t0) > 0:
-                        dict1.update({hex(addresses[currentShop]+positionTracker) : t0[0] })
+                        rom.update({hex(addresses[currentShop]+positionTracker) : t0[0] })
                         t0.pop(0)
                     elif len(nexttier) > 0:
-                        dict1.update({hex(addresses[currentShop]+positionTracker) : nexttier[0] })
+                        rom.update({hex(addresses[currentShop]+positionTracker) : nexttier[0] })
                         nexttier.pop(0)
                     currentShop+=1
                     if (currentShop > len(addresses)-1):
@@ -173,13 +174,13 @@ def shopShuffle(dict1, class1):
                         positionTracker+=1
                     totalItems-=1
                 while positionTracker < 8:
-                    dict1.update({hex(addresses[currentShop]+positionTracker) : b"FF" })
+                    rom.update({hex(addresses[currentShop]+positionTracker) : b"FF" })
                     currentShop+=1
                     if (currentShop > len(addresses)-1):
                         currentShop = 0
                         positionTracker+=1
         i+=1
-    return dict1
+    return rom
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
