@@ -1,4 +1,4 @@
-import binascii
+import mmap
 import random
 from re import M
 import FFL2R_data
@@ -14,8 +14,6 @@ def main(rom_path:str|None, seed:int|None):
     else:
         gameFile = rom_path
 
-    romData = {}
-
     #  seeding
     if not seed:
         gameSeed_str = str(input("And now a seed please. Blank will generate a random number."))
@@ -30,55 +28,53 @@ def main(rom_path:str|None, seed:int|None):
     print("Seed is: " + str(gameSeed))
 
     with open(gameFile, 'rb') as f:
-        hexData = binascii.hexlify(f.read())
-
-    romData = FFL2R_utils.GameUtility.create(romData, hexData)
+        romData = mmap.mmap(f.fileno(), length=0, access=mmap.ACCESS_COPY,offset=0)  
 
     romData = treasureShuffle(romData, FFL2R_data.GameData)
     romData = magiShuffle(romData, FFL2R_data.GameData)
     
     romData = FFL2R_utils.GameUtility.safeUnlocks(romData)
     romData = FFL2R_utils.GameUtility.magiFix(romData)
+    romData = FFL2R_utils.GameUtility.mutantFix(romData)
 
     for key, value in FFL2R_data.GameData.newItemPrices.items():
-        romData.update({hex(key) : value})
+         romData[key] = value
 
     romData = shopShuffle(romData, FFL2R_data.GameData)
 
     with open('Final Fantasy Legend 2 - ' + str(gameSeed) + '.gb', 'xb') as f:
-        for key, value in romData.items():
-            f.write(binascii.unhexlify(value))
+            f.write(romData)
 
     print ("Done!")
 
-def treasureShuffle(rom:dict, data:FFL2R_data) -> dict:
+def treasureShuffle(rom:mmap, data:FFL2R_data) -> mmap:
     random.shuffle(data.treasures)
     i=0
     for address in data.treasureAddresses:
-        rom.update({ hex(address) : data.treasures[i] })
-        if data.treasures[i] == b"FF":
-            j = hex(address - 0x2)
-            rom[j] = bytes(hex(int(rom[j], 16)+64)[2:].upper(), encoding='utf-8')
+        rom[address] = data.treasures[i]
+        if data.treasures[i] == 0xFF:
+            j = address - 2
+            rom[j] = rom[j]+64
         i+=1
     return rom
 
-def magiShuffle(rom:dict, data:FFL2R_data) -> dict:
+def magiShuffle(rom:mmap, data:FFL2R_data) -> mmap:
     rom = FFL2R_utils.GameUtility.scriptPatch(rom)
     random.shuffle(data.magi)
     i=0
     for address in data.magiAddresses:
-        rom.update({ hex(address) : data.magi[i] })
+        rom[address] = data.magi[i]
         #race MAGI duplication
         if address == 0x2ab55:
-            rom.update({ hex(174816) : data.magi[i] }) #0x2aae0
+            rom[0x2aae0] = data.magi[i]
         elif address == 0x2ab5b:
-            rom.update({ hex(174855) : data.magi[i] }) #0x2ab07
+            rom[0x2ab07] = data.magi[i]
         elif address == 0x2ab61:
-            rom.update({ hex(174895): data.magi[i] }) #0x2ab2f
+            rom[0x2ab2f] = data.magi[i]
         i+=1
     return rom
 
-def shopShuffle(rom:dict, data:FFL2R_data) -> dict:
+def shopShuffle(rom:mmap, data:FFL2R_data) -> mmap:
     i=1
     while i <= 10:
         match i:
@@ -88,13 +84,13 @@ def shopShuffle(rom:dict, data:FFL2R_data) -> dict:
                 t7 = list(data.shopTiers[7])
                 random.shuffle(t7)
                 while a < 8:
-                    rom.update({hex(260736+a) : t7[a]})
+                    rom[0x3fa80+a] = t7[a]
                     a+=1
             #recurring
             case 8:
                 a=0
                 while a < 8:
-                    rom.update({hex(260744+a) : data.shopTiers[8][a]})
+                    rom[0x3fa88+a] = data.shopTiers[8][a]
                     a+=1
             #echigoya
             case 9:
@@ -113,7 +109,7 @@ def shopShuffle(rom:dict, data:FFL2R_data) -> dict:
                     echigoya.append(t7[b])
                     b-=1
                 while c < 8:
-                    rom.update({hex(260752+c) : echigoya[c]})
+                    rom[0x3fa90+c] = echigoya[c]
                     c+=1
             #giant town special
             case 10:
@@ -139,9 +135,9 @@ def shopShuffle(rom:dict, data:FFL2R_data) -> dict:
                     c-=1
                 while d < 8:
                     if d+1 <= len(gianttown):
-                        rom.update({hex(260760+d) : gianttown[d]})
+                        rom[0x3fa98+d] = gianttown[d]
                     else:
-                        rom.update({hex(260760+d) : b"FF"})
+                        rom[0x3fa98+d] = 0xFF
                     d+=1
             case _:
                 addresses = []
@@ -160,13 +156,13 @@ def shopShuffle(rom:dict, data:FFL2R_data) -> dict:
                 positionTracker = 0
                 while totalItems > 0:
                     if len(tier) > 0:
-                        rom.update({hex(addresses[currentShop]+positionTracker) : tier[0] })
+                        rom[addresses[currentShop]+positionTracker] = tier[0]
                         tier.pop(0)
                     elif len(t0) > 0:
-                        rom.update({hex(addresses[currentShop]+positionTracker) : t0[0] })
+                        rom[addresses[currentShop]+positionTracker] = t0[0]
                         t0.pop(0)
                     elif len(nexttier) > 0:
-                        rom.update({hex(addresses[currentShop]+positionTracker) : nexttier[0] })
+                        rom[addresses[currentShop]+positionTracker] = nexttier[0]
                         nexttier.pop(0)
                     currentShop+=1
                     if (currentShop > len(addresses)-1):
@@ -174,7 +170,7 @@ def shopShuffle(rom:dict, data:FFL2R_data) -> dict:
                         positionTracker+=1
                     totalItems-=1
                 while positionTracker < 8:
-                    rom.update({hex(addresses[currentShop]+positionTracker) : b"FF" })
+                    rom[addresses[currentShop]+positionTracker] = 0xFF
                     currentShop+=1
                     if (currentShop > len(addresses)-1):
                         currentShop = 0
