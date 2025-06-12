@@ -1,5 +1,8 @@
 ## Final Fantasy Legend 2 Randomizer
 
+### Version 0.3.2 (6/11/2025):
+- Yet Even More code cleanup. Maybe someday I'll be a proper engineer. Today is not that day.
+
 ### Version 0.3.1 (6/9/2025):
 - Further code cleanup.
 - Fixed some in-game bugs related to MAGI:
