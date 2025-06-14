@@ -61,15 +61,15 @@ mapping the ROM have made this possible.
 #### Version 0.2.0 (5/27/2025):
 - Shop rando is completed (Thanks Treble!).
 
-### Version 0.1.3 (5/24/2025):
+#### Version 0.1.3 (5/24/2025):
 - Fixed issue with seeding not producing consistent results.
 
-### Version 0.1.2 (5/23/2025):
+#### Version 0.1.2 (5/23/2025):
 - Treasure Chests, if empty, will be open.
 - Some code cleanup, improvements.
 
-### Version 0.1.1 (5/22/2025):
+#### Version 0.1.1 (5/22/2025):
 -Cleaned up some usability issues (Thanks Destil!).
 
-### Version 0.1.0 (5/21/2025):
+#### Version 0.1.0 (5/21/2025):
 - Initial commit
