@@ -42,7 +42,7 @@ mapping the ROM have made this possible.
 - Alex Jackson - Gamefaqs poster that originally dove into hexediting the ROM.
 - Friends Destil and Treble, for contributing and listening.
 
-###Complete version history
+### Complete version history
 
 #### Version 0.3.2 (6/11/2025):
 - Yet Even More code cleanup. Maybe someday I'll be a proper engineer. Today is not that day.
@@ -58,18 +58,18 @@ mapping the ROM have made this possible.
 - When you break a door locked by magi, it is permanent (will be optionized in the future). No more potentially getting stuck when Apollo steals your magi.
 - Slight code cleanup.
 
-####Version 0.2.0 (5/27/2025):
+#### Version 0.2.0 (5/27/2025):
 - Shop rando is completed (Thanks Treble!).
 
-###Version 0.1.3 (5/24/2025):
+### Version 0.1.3 (5/24/2025):
 - Fixed issue with seeding not producing consistent results.
 
-###Version 0.1.2 (5/23/2025):
+### Version 0.1.2 (5/23/2025):
 - Treasure Chests, if empty, will be open.
 - Some code cleanup, improvements.
 
-###Version 0.1.1 (5/22/2025):
+### Version 0.1.1 (5/22/2025):
 -Cleaned up some usability issues (Thanks Destil!).
 
-###Version 0.1.0 (5/21/2025):
+### Version 0.1.0 (5/21/2025):
 - Initial commit
