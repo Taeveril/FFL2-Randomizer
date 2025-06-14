@@ -69,7 +69,7 @@ mapping the ROM have made this possible.
 - Some code cleanup, improvements.
 
 #### Version 0.1.1 (5/22/2025):
--Cleaned up some usability issues (Thanks Destil!).
+- Cleaned up some usability issues (Thanks Destil!).
 
 #### Version 0.1.0 (5/21/2025):
 - Initial commit
