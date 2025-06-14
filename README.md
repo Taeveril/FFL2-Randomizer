@@ -29,6 +29,7 @@
 
 ## Plans:
 - Increase gold drops.
+  - This includes trying to fix the if meats drop then no additional gold bug.
 - Adjust chance for growth.
 - Movement speed increase.
 
