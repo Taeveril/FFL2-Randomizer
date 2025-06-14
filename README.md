@@ -30,7 +30,7 @@
 ## Plans:
 - Increase gold drops.
   - This includes trying to fix the if meats drop then no additional gold bug.
-- Adjust chance for growth.
+- Increase growth chance for humans/mutants.
 - Movement speed increase.
 
 ## Credits and thank yous:
