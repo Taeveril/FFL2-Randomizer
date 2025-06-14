@@ -7,7 +7,10 @@ import argparse
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 
-def main(rom_path:str|None, seed:int|None):
+def main(rom_path:str|None, seed:int|None, encounterRate:int|None):
+
+    version = 0.4
+
     Tk().withdraw()
     if not rom_path:
         gameFile = askopenfilename(title="First, please point to the FFL2 rom.")
@@ -18,21 +21,30 @@ def main(rom_path:str|None, seed:int|None):
     if not seed:
         gameSeed_str = str(input("And now a seed please. Blank will generate a random number."))
         try:
-            gameSeed=int(gameSeed_str)
+            gameSeed = int(gameSeed_str)
             gameSeed = abs(gameSeed)
         except:
             gameSeed = random.randint(0, 4294967296)
-        random.seed(gameSeed)
     else:
         gameSeed = seed
+    random.seed(gameSeed)    
     print("Seed is: " + str(gameSeed))
+
+    if not encounterRate:
+        encounterRate = int(input("Encounter rate please, 20-200. "))
 
     with open(gameFile, 'rb') as f:
         romData = mmap.mmap(f.fileno(), length=0, access=mmap.ACCESS_COPY,offset=0)  
+    
+    romData = FFL2R_utils.GameUtility.titlePatch(version, seed, romData)
+
+    if encounterRate != 100:
+        romData = encounterRateAdjustment(romData, encounterRate, FFL2R_data.GameData.mapEncounterRateAddresses)
 
     romData = treasureShuffle(romData, FFL2R_data.GameData)
-    romData = magiShuffle(romData, FFL2R_data.GameData)
-    
+    romData = magiShuffle(romData, FFL2R_data.GameData)    
+    romData = shopShuffle(romData, FFL2R_data.GameData)
+
     romData = FFL2R_utils.GameUtility.safeUnlocks(romData)
     romData = FFL2R_utils.GameUtility.magiFix(romData)
     romData = FFL2R_utils.GameUtility.mutantFix(romData)
@@ -40,12 +52,25 @@ def main(rom_path:str|None, seed:int|None):
     for key, value in FFL2R_data.GameData.newItemPrices.items():
          romData[key] = value
 
-    romData = shopShuffle(romData, FFL2R_data.GameData)
-
     with open('Final Fantasy Legend 2 - ' + str(gameSeed) + '.gb', 'xb') as f:
             f.write(romData)
 
     print ("Done!")
+
+def encounterRateAdjustment(rom:mmap, rate:int, data:list) -> mmap:
+    if rate < 20:
+        rate = 20
+    elif rate > 200:
+        rate = 200
+    
+    percent = rate / 100
+
+    #if a map's encounter rate is 0, it winds up for a default encounter rate somehow. So it floors at 1.
+    for address in data:
+        rom[address] = int(rom[address] * percent)
+        if rom[address] == 0:
+            rom[address] = 1
+    return rom
 
 def treasureShuffle(rom:mmap, data:FFL2R_data) -> mmap:
     random.shuffle(data.treasures)
@@ -53,13 +78,12 @@ def treasureShuffle(rom:mmap, data:FFL2R_data) -> mmap:
     for address in data.treasureAddresses:
         rom[address] = data.treasures[i]
         if data.treasures[i] == 0xFF:
-            j = address - 2
-            rom[j] = rom[j]+64
+            rom[address-2]+=64
         i+=1
     return rom
 
 def magiShuffle(rom:mmap, data:FFL2R_data) -> mmap:
-    rom = FFL2R_utils.GameUtility.scriptPatch(rom)
+    rom = FFL2R_utils.GameUtility.magiScriptPatch(rom)
     random.shuffle(data.magi)
     i=0
     for address in data.magiAddresses:
@@ -180,7 +204,8 @@ def shopShuffle(rom:mmap, data:FFL2R_data) -> mmap:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument('-s', '--seed', type=str) # todo - pathlib
-    parser.add_argument('-r', '--rom_path', type=int, dest="rom_path")
+    parser.add_argument('-s', '--seed', type=int) # todo - pathlib
+    parser.add_argument('-r', '--rom_path', type=str, dest="rom_path")
+    parser.add_argument('-e', '--encounter_rate', type=int)
     args = parser.parse_args()
-    main(rom_path = args.rom_path, seed=args.seed)
+    main(rom_path = args.rom_path, seed=args.seed, encounterRate=args.encounter_rate)

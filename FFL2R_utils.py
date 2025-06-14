@@ -2,7 +2,61 @@ import mmap
 
 class GameUtility:
 
-    def scriptPatch(rom:mmap) -> mmap:
+    def titlePatch(vers:float, seed:int, rom:mmap) -> mmap:
+        i=0x2f42a
+        while i<=0x2f498:
+            if i % 2 == 0:
+                if (rom[i] + 29) > 255:
+                    carryOver = rom[i]
+                    carryOver +=29
+                    carryOver -=256
+                    rom[i] = carryOver
+                    i+=1
+                    rom[i]+=1
+                else:
+                    rom[i]+=29
+            i+=1
+
+        titleUpdate = GameUtility.infoPatchList(vers, seed)
+        dataShift = []
+        j=0x2f8c8
+        k=0
+
+        while j<=0x2ffeb:
+            if j >=0x2f8c8 and j<=0x2f8ef:
+                if j >= 0x2f8d3:
+                    dataShift.append(rom[j])
+                rom[j] = titleUpdate[k]
+                k+=1
+            else:
+                dataShift.append(rom[j])
+                rom[j] = dataShift[0]
+                dataShift.pop(0)
+                if j == 0x2f90b:
+                    rom[j] = 0x05
+            j+=1
+        return rom
+
+    def infoPatchList(vers:float, seed:int) -> list:
+        finalList = [0x36, 0x03, 0xCB, 0x59, 0xD7, 0x81, 0xDC, 0xED, 0x53, 0xFF] #"Randomizer "
+        finalList.extend(GameUtility.hexList(str(vers), 4))
+        finalList.extend([0x05, 0x36, 0x03, 0xCC, 0xD8, 0x8F, 0xFF]) #"Seed "
+        finalList.extend(GameUtility.hexList(str(seed), 10))
+        finalList.extend([0x06, 0xFF, 0xFF, 0x2E, 0xFF, 0xCC, 0xE7, 0x6E, 0x54]) #truncate start/continue selection (c) and license
+        return finalList
+
+    def hexList(info:str, maxLength:int)-> list:
+        hexes = []
+        for digit in info:
+            if digit.isdigit():
+                hexes.append(int(digit) + 0xB0)
+            else: #float w/ dot
+                hexes.append(0xF0)
+        while len(hexes) < maxLength:
+            hexes.insert(0, 0xFF)
+        return hexes
+
+    def magiScriptPatch(rom:mmap) -> mmap:
         i=0x2c000
         insertion = []
         while i <= 0x2ea10:
