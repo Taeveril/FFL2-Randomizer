@@ -5,6 +5,7 @@
 - Magi shuffle.
 - Shop shuffle.
 - QoL Features:
+  - Empty chests will appear open.
   - Encounter rate adjustment.
   - Central pillar worlds stay unlocked once MAGI threshold met.
   - Game bug fixes:
