@@ -17,7 +17,7 @@
 
 ## Version 0.5.0 (6/21/2025):
 - Gold rate adjustment introduced. Will prompt for a number between 50-500 and will turn into a percentage to adjust.
-   - Gold will currently cap at 65535. 10% bonus for all monsters defeated still there.
+   - Gold drops will currently cap at 65535. 10% bonus for all monsters defeated still there.
    - Have not yet fixed the meat/gold drop bug. Learning assembly (and translating it to hex) as fast as I can to try and get this fixed.
 - The Magi Leon steals from you will now appropriately display.
 - Fixed an issue where the title screen may not always show the seed number.
