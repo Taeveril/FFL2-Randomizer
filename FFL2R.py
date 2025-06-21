@@ -9,7 +9,7 @@ from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 
 MAXINT = 255
-VERSION = 0.4
+VERSION = 0.5
 
 def main(rom_path:str|None, seed:int|None, encounterRate:int|None, goldDrops:int|None):
     Tk().withdraw()
