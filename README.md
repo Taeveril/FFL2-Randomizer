@@ -49,7 +49,7 @@ mapping the ROM have made this possible.
 
 ### Complete version history
 
-### Version 0.4.0 (6/14/2025):
+#### Version 0.4.0 (6/14/2025):
 - Encounter rate adjustment introduced. Will prompt for a number between 20-200 and will turn into a percentage to adjust.
 - Title screen will now display version and seed.
 - Misc bug cleanup:
