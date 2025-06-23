@@ -231,6 +231,20 @@ class GameUtility:
         rom[0x3119C] = 0x08
         return rom
 
+    #There is a specific player movement speed variable. This sets it to 0x02 rather than 0x01, which is basically double speed.
+    #increasing it higher than that starts messing up the loaded graphics. So without an overhaul, this will have to do for the
+    #time being.
+    def speedHax(rom:mmap) -> mmap:
+        hax = (
+            0x01e3e,
+            0x01e43,
+            0x01e54
+            )
+        
+        for address in hax:
+            rom[address] = 0x02
+        return rom
+
 
 
 

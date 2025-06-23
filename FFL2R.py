@@ -48,6 +48,7 @@ def main(rom_path:str|None, seed:int|None, encounterRate:int|None, goldDrops:int
     romData = FFL2R_utils.GameUtility.safeUnlocks(romData)
     romData = FFL2R_utils.GameUtility.magiFix(romData)
     romData = FFL2R_utils.GameUtility.mutantFix(romData)
+    romData = FFL2R_utils.GameUtility.speedHax(romData)
 
     if encounterRate != 100:
         romData = encounterRateAdjustment(romData, encounterRate, FFL2R_data.GameData.mapEncounterRateAddresses)
