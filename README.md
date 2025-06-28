@@ -4,20 +4,24 @@
 - Treasure shuffle.
 - Magi shuffle.
 - Shop shuffle.
+- Starting monsters randomized.
 - QoL Features:
   - Empty chests will appear open.
   - Encounter rate adjustment.
   - Gold drop adjustment.
   - Central pillar worlds stay unlocked once MAGI threshold met.
   - Double movement speed.
+  - Default fast text speed.
   - Game bug fixes:
     - Elemental MAGI behaves appropriately.
     - Mana MAGI affinity enabled.
     - Mutant stat growth behaves as expected.
 
 
-## Version 0.5.1 (6/23/2025):
-- Movement speed doubled.
+##Version 0.6.0 (6/23/2025):
+- Randomized monsters in the starting character select screen. Will also show hidden DS level to give players an idea of how good they are at the start.
+- Text speed will default to fastest, pressing a button unnecessary.
+- Fixed an issue where encounter rate adjustment would create a game-fatal treasure chest in the Nasty Dungeon if interacted with.
 
 ## How to:
 - Download the Python scripts (and install Python if you don't have it).
