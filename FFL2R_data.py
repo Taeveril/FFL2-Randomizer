@@ -590,7 +590,6 @@ class GameData:
         0x1E3B6,
         0x1E3F0,
         0x1E415,
-        0x1E427,
         0x1E43A,
         0x1E45F,
         0x1E48A,

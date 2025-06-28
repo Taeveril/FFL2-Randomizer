@@ -2,7 +2,7 @@ import mmap
 
 class GameUtility:
 
-    def titlePatch(vers:float, seed:int, rom:mmap) -> mmap:
+    def titlePatch(VERSION:float, seed:int, rom:mmap) -> mmap:
         i=0x2f42a
         while i<=0x2f498:
             if i % 2 == 0:
@@ -17,7 +17,7 @@ class GameUtility:
                     rom[i]+=29
             i+=1
 
-        titleUpdate = GameUtility.infoPatchList(vers, seed)
+        titleUpdate = GameUtility.infoPatchList(VERSION, seed)
         dataShift = []
         j=0x2f8c8
         k=0
@@ -37,9 +37,9 @@ class GameUtility:
             j+=1
         return rom
 
-    def infoPatchList(vers:float, seed:int) -> list:
+    def infoPatchList(VERSION:float, seed:int) -> list:
         finalList = [0x36, 0x03, 0xCB, 0x59, 0xD7, 0x81, 0xDC, 0xED, 0x53, 0xFF] #"Randomizer "
-        finalList.extend(GameUtility.hexList(str(vers), 4))
+        finalList.extend(GameUtility.hexList(str(VERSION), 4))
         finalList.extend([0x05, 0x36, 0x03, 0xCC, 0xD8, 0x8F, 0xFF]) #"Seed "
         finalList.extend(GameUtility.hexList(str(seed), 10))
         finalList.extend([0x06, 0xFF, 0xFF, 0x2E, 0xFF, 0xCC, 0xE7, 0x6E, 0x54]) #truncate start/continue
@@ -212,6 +212,110 @@ class GameUtility:
 
         return rom
 
+    def monsterSelect(monsters:list, rom:mmap) -> mmap:
+        shiftList = []
+        dslist = []
+        #shift the rest of the monster ability array
+        remainingAddr = 0x37e8b
+        currentAddr = remainingAddr
+        while currentAddr <= 0x37eb4:
+            shiftList.append(rom[currentAddr])
+            currentAddr+=1
+        c=0
+
+        for monster in monsters:
+            currentMonster = RandomMonster(monster)
+            monstersIndex = monsters.index(monster)
+            rom[0x338f5+monstersIndex] = rom[currentMonster.monFamAddr]
+            rom[0x33e45+monstersIndex] = rom[currentMonster.monAIAddr]
+            rom[0x364f5+monstersIndex] = rom[currentMonster.monGFXAddr]
+            rom[0x36c65+monstersIndex] = rom[currentMonster.monNPCAddr]
+
+            #calc DS level from monAIAddr low nibble, put it on the select screen
+            dslist.append(rom[currentMonster.monAIAddr] & 0x0f)
+
+            for stat in currentMonster.statArray:
+                statIndex = currentMonster.statArray.index(stat)
+                match statIndex:
+                    case 8:
+                        currentMonster.skillListAddr.append(rom[currentMonster.monStatAddr + 8])
+                        rom[0x37912 + (monstersIndex * 10) + 8] = 0x8b + c
+                    case 9:
+                        currentMonster.skillListAddr.append(rom[currentMonster.monStatAddr + 9])
+                        rom[0x37912 + (monstersIndex * 10) + 9] = 0x7e
+                    case _:
+                        rom[0x37912 + (monstersIndex * 10) + statIndex] = rom[stat]
+                        rom[0x3f668 + (monstersIndex * 8) + statIndex] = rom[currentMonster.name[statIndex]]
+                        if statIndex == 0:
+                            currentMonster.skillListLength = rom[currentMonster.statArray[0]] - 31
+
+            currentMonster.skillListLoc = currentMonster.getSkillListLoc(currentMonster.skillListAddr)            
+            
+            i = 0
+            while i < currentMonster.skillListLength:               
+                currentMonster.skillList.append(rom[currentMonster.skillListLoc + i])
+                i+=1
+
+            for skill in currentMonster.skillList:
+                rom[remainingAddr] = skill
+                remainingAddr+=1
+
+            c = c + currentMonster.skillListLength
+
+        j = 0
+        while j <= 7:
+           rom[0x37938 + (j*10)] = rom[0x37938 + (j*10)] + c
+           j+=1
+
+        for value in shiftList:
+            rom[remainingAddr] = value
+            remainingAddr+=1
+
+        #recalc menu addr block 9 more bytes:       
+        hexlevels = []
+        for level in dslist:
+            if level < 10:
+                hexlevels.append(0xff)
+                hexlevels.append(0xb0 + level)
+            else:
+                hexlevels.append(0xb1)
+                hexlevels.append(0xb0 + (level - 10))
+        
+        i = 0x2f42c
+        while i <= 0x2f499:
+            if i % 2 == 0:
+                if (rom[i] + 9) > 255:
+                    carryOver = rom[i]
+                    carryOver +=9
+                    carryOver -=256
+                    rom[i] = carryOver
+                    i+=1
+                    rom[i]+=1
+                else:
+                    rom[i]+=9
+            i+=1
+
+        shiftedList = []
+        j = 0x2f966
+        while j <= 0x2ffff:
+            shiftedList.append(rom[j])
+            match j:
+                case 0x2f966 | 0x2f974 | 0x2f982:
+                    rom[j] = 0xff #space
+                    j+=1
+                    shiftedList.append(rom[j])
+                    rom[j] = hexlevels[0]
+                    hexlevels.pop(0)
+                    j+=1
+                    shiftedList.append(rom[j])
+                    rom[j] = hexlevels[0]
+                    hexlevels.pop(0)
+                case _:
+                    rom[j] = shiftedList[0]
+                    shiftedList.pop(0)
+            j+=1
+        return rom          
+
     def magiFix(rom:mmap) -> mmap:
         fix = {
             0x32e29 : 0x0C, #elemental magi fix
@@ -235,17 +339,93 @@ class GameUtility:
     #increasing it higher than that starts messing up the loaded graphics. So without an overhaul, this will have to do for the
     #time being.
     def speedHax(rom:mmap) -> mmap:
-        hax = (
+        moveHax = (
+            #movement
             0x01e3e,
             0x01e43,
             0x01e54
             )
         
-        for address in hax:
+        for address in moveHax:
             rom[address] = 0x02
+
+    #this will speed text up without the a button as a default.
+    #0x06 is default speed, 0x00 is fastest (as if a were pressed). Increasing value slows text down.
+        textHax = (
+             0x01470,
+             0x067A0
+             )
+        for address in textHax:
+             rom[address] = 0x00
+
         return rom
 
 
+class RandomMonster:
+    def __init__(self, monster:int):
+        self.monster = monster
+        self.monFamAddr = 0x33800 + self.monster
+        self.monAIAddr = 0x33d50 + self.monster
+        self.monGFXAddr = 0x36400 + self.monster
+        self.monNPCAddr = 0x36b70 + self.monster
+        self.monStatAddr = 0x36f80 + (self.monster * 10) #len 10
+        self.statArray = self.getStatArray(self.monStatAddr)
+        self.skillListLength = 0
+        self.skillList = []
+        self.skillListAddr = []
+        self.skillListLoc = 0
+        self.nameAddr = 0x3eec0 + (self.monster * 8)
+        self.name = self.getName(self.nameAddr)
 
+    def getStatArray(self, addr:int)->list:
+        stats = []
+        i=0
+        while i < 10:
+            stats.append(addr + i)
+            i+=1
+        return stats
 
+    def getSkillListLoc(self, statArrayAddr:list)->int:
+        MAXINT = 255
+        location = statArrayAddr[1]<< MAXINT.bit_length() | statArrayAddr[0] + 0x30000
+        return location
+
+    def getName(self, addr:int)->list:
+        name = []
+        i=0
+        while i < 8:
+            name.append(addr + i)
+            i+=1
+        return name
+
+    # def lockInfo(MAXINT:int, rom:mmap) -> mmap:
+    #     i=0x2c032
+    #     while i <= 0x2c183:
+    #         if (rom[i] + 11) > MAXINT:
+    #             carryOver = rom[i]
+    #             carryOver +=11
+    #             carryOver -=256
+    #             rom[i] = carryOver
+    #             i+=1
+    #             rom[i]+=1
+    #         else:
+    #             rom[i]+=11
+    #         i+=1
+
+    #     lock0 = [0xBE, 0xEB, 0x87, 0xF5, 0x06, 0x9E, 0xFF, 0xB4, 0xF5, 0x2C, 0x06, 0x1A, 0x03, 0x19, 0x01, 0x37, 0x00, 0x19, 0x00, 0x2F, 0x00] #Exit, but lets repurpose this for Ashura
+    #     lock1 = [0xC4, 0xDC, 0x77, 0xFF, 0xC1, 0x75, 0xD7, 0xF5, 0x06, 0x9E, 0xB2, 0xB4, 0xF5, 0x2C, 0x06, 0x1A, 0x17, 0x19, 0x01, 0x10, 0x00, 0x19, 0x00, 0x2F, 0x00] #Ki's Head
+    #     lock2 = [0xCF, 0xD4, 0xDF, 0x6A, 0x67, 0xD4, 0xF5, 0x06, 0x9E, 0xB6, 0xB8, 0xF5, 0x2C, 0x06, 0x1A, 0x43, 0x19, 0x01, 0x37, 0x00, 0x19, 0x00, 0x2F, 0x00] #Valhalla
+    #     lock3 = [0xC1, 0x55, 0x80, 0xF5, 0x06, 0x9E, 0xB1, 0xB8, 0xF5, 0x2C, 0x06, 0x1A, 0x11, 0x19, 0x01, 0x37, 0x00, 0x19, 0x00, 0x2F, 0x00] #House
+    #     lock4 = [0xC0, 0xDC, 0x59, 0xE7, 0x77, 0xFF, 0xD0, 0x66, 0xDF, 0xD7, 0xF5, 0x06, 0x9E, 0xB1, 0xB5, 0xF5, 0x2C, 0x06, 0x1A, 0x0E, 0x19, 0x01, 0x37, 0x00, 0x19, 0x00, 0x2F, 0x00] #Giant's World
+    #     lock5 = [0xBA, 0xE3, 0xE2, 0x67, 0xE2, 0x77, 0xFF, 0xD0, 0x66, 0xDF, 0xD7, 0xF5, 0x06, 0x9E, 0xB2, 0xB5, 0xF5, 0x2C, 0x06, 0x1A, 0x18, 0x19, 0x01, 0x37, 0x00, 0x19, 0x00, 0x2F, 0x00] #Apollo's World
+    #     lock6 = [0xC0, 0xE8, 0x6E, 0xD7, 0xDC, 0x59, 0x77, 0xFF, 0xBB, 0x89, 0xD8, 0xF5, 0x06, 0x9E, 0xB3, 0xB5, 0xF5, 0x2C, 0x06, 0x1A, 0x22, 0x19, 0x01, 0x37, 0x00, 0x19, 0x00, 0x2F, 0x00] #Guardian's Base
+    #     lock7 = [0xC7, 0x56, 0xDD, 0xD4, 0xF5, 0x06, 0x9E, 0xB3, 0xB9, 0xF5, 0x2C, 0x06, 0x1A, 0x26, 0x19, 0x01, 0x37, 0x00, 0x19, 0x00, 0x2F, 0x00] #ninja
+    #     lock8 = [0xCF, 0x8B, 0x8E, 0xEE, 0xFF, 0xD0, 0x66, 0xDF, 0xD7, 0xF5, 0x06, 0x9E, 0xB4, 0xB1, 0xF5, 0x2C, 0x06, 0x1A, 0x29, 0x19, 0x01, 0x37, 0x00, 0x19, 0x00, 0x2F, 0x00] #Venus' World
+    #     lock9 = [0xCB, 0xD4, 0xD6, 0x4E, 0xD0, 0x66, 0xDF, 0xD7, 0xF5, 0x06, 0x9E, 0xB5, 0xB9, 0xF5, 0x2C, 0x06, 0x1A, 0x3A, 0x19, 0x01, 0x37, 0x00, 0x19, 0x00, 0x2F, 0x00] #Race World
+    #     locka = [0xBE, 0xD7, 0xE2, 0xF5, 0x06, 0x9E, 0xB6, 0xB3, 0xF5, 0x2C, 0x06, 0x1A, 0x3E, 0x19, 0x01, 0x37, 0x00, 0x19, 0x00, 0x2F, 0x00] #edo
+    #     lockb = [0xC7, 0x89, 0xE7, 0x72, 0xBD, 0xE8, 0x6B, 0xD8, 0x65, 0xF5, 0x06, 0x9E, 0xB6, 0xB7, 0xF5, 0x2C, 0x06, 0x1A, 0x42, 0x19, 0x01, 0x37, 0x00, 0x19, 0x00, 0x2F, 0x00] #nasty dungeon
+    #     lockc = [0xBC, 0x8B, 0xE7, 0x82, 0x96, 0xC9, 0xDC, 0x67, 0x6E, 0xF5, 0x06, 0x9E, 0xFF, 0xB1, 0xF5, 0x2C, 0x06, 0x1A, 0x00, 0x19, 0x01, 0x37, 0x00, 0x19, 0x00, 0x2F, 0x00] #central pillar
+
+        #j=0x2ca18
+        #while j <= 0x2eae0:
 

@@ -1,6 +1,7 @@
 import mmap
 import random
 from re import M
+from shutil import move
 from xmlrpc.client import MAXINT
 import FFL2R_data
 import FFL2R_utils
@@ -9,7 +10,7 @@ from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 
 MAXINT = 255
-VERSION = 0.5
+VERSION = 0.6
 
 def main(rom_path:str|None, seed:int|None, encounterRate:int|None, goldDrops:int|None):
     Tk().withdraw()
@@ -44,6 +45,7 @@ def main(rom_path:str|None, seed:int|None, encounterRate:int|None, goldDrops:int
     romData = treasureShuffle(romData, FFL2R_data.GameData)
     romData = magiShuffle(romData, FFL2R_data.GameData)    
     romData = shopShuffle(romData, FFL2R_data.GameData)
+    romData = newMonsters(romData)
 
     romData = FFL2R_utils.GameUtility.safeUnlocks(romData)
     romData = FFL2R_utils.GameUtility.magiFix(romData)
@@ -230,6 +232,11 @@ def shopShuffle(rom:mmap, data:FFL2R_data) -> mmap:
                         currentShop = 0
                         positionTracker+=1
         i+=1
+    return rom
+
+def newMonsters(rom:mmap) -> mmap:
+    randoMonsters = random.sample(range(180),3)
+    rom = FFL2R_utils.GameUtility.monsterSelect(randoMonsters, rom)
     return rom
 
 if __name__ == "__main__":
