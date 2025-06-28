@@ -18,7 +18,7 @@
     - Mutant stat growth behaves as expected.
 
 
-## Version 0.6.0 (6/23/2025):
+## Version 0.6.0 (6/28/2025):
 - Randomized monsters in the starting character select screen. Will also show hidden DS level to give players an idea of how good they are at the start.
 - Text speed will default to fastest, pressing a button unnecessary.
 - Fixed an issue where encounter rate adjustment would create a game-fatal treasure chest in the Nasty Dungeon if interacted with.
