@@ -12,16 +12,18 @@
   - Central pillar worlds stay unlocked once MAGI threshold met.
   - Double movement speed.
   - Default fast text speed.
+  - Mr. S will no longer block the first cave entrance upon completion.
   - Game bug fixes:
     - Elemental MAGI behaves appropriately.
     - Mana MAGI affinity enabled.
     - Mutant stat growth behaves as expected.
 
+Known issue: Race sequence will be graphically odd, but does not do anything adverse. Fixed by simply dismounting/remounting the dragon for each leg. 
 
-## Version 0.6.0 (6/28/2025):
-- Randomized monsters in the starting character select screen. Will also show hidden DS level to give players an idea of how good they are at the start.
-- Text speed will default to fastest, pressing a button unnecessary.
-- Fixed an issue where encounter rate adjustment would create a game-fatal treasure chest in the Nasty Dungeon if interacted with.
+## Version 0.7.0 (7/21/2025):
+  - Complete code overhaul. Will help with future feature development.
+  - Mr. S will no longer block the starting entrance, incase you forget something in the starting cave.
+
 
 ## How to:
 - Download the Python scripts (and install Python if you don't have it).
