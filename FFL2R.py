@@ -218,7 +218,7 @@ def magiShuffle(scriptingBlock1:FFL2R_io.ScriptBlock, scriptingBlock2:FFL2R_io.S
         if script[0] in (201, 202, 203): #race scripts
             raceMagi.insert(0, magiList[0])
         magiList.pop(0)
-        if script[0] == 204: #slow dragon race script
+        if script[0] == 204 and raceMagi: #slow dragon race script
             magiList.insert(0, raceMagi[0])
             raceMagi.pop(0)  
 
