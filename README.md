@@ -20,6 +20,9 @@
 
 Known issue: Race sequence will be graphically odd, but does not do anything adverse. Fixed by simply dismounting/remounting the dragon for each leg. 
 
+## Version 0.7.1 (7/22/2025):
+  - Fixed an issue that was preventing writing out rom.
+
 ## Version 0.7.0 (7/21/2025):
   - Complete code overhaul. Will help with future feature development.
   - Mr. S will no longer block the starting entrance, incase you forget something in the starting cave.
