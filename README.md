@@ -40,8 +40,6 @@ Known issue: Race sequence will be graphically odd, but does not do anything adv
 
 ## Plans:
 - World randomizer.
-- Ttrying to fix the if meats drop then no additional gold bug.
-- Increase growth chance for humans/mutants.
 
 ## Credits and thank yous:
 This project really stands on the shoulders of giants. Over two decades of people poking and
