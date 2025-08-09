@@ -26,8 +26,8 @@ Known issue: Race sequence will be graphically odd, but does not do anything adv
 - Some more quality of life bugfixing (thank you tehtmi!):
 	-	Gold will now calculate correctly when multiple groups of enemies are defeated and meat/an item drops.
 	-	Multiple stats can grow after battle for a single character.
-			- The chance to grow has also drastically increased.
-			- The chance for mutants to change skills has also slightly increased.
+		-	The chance to grow has also drastically increased.
+		- 	The chance for mutants to change skills has also slightly increased.
 -	Will now check for a correct rom.
 
 
