@@ -1,5 +1,16 @@
 Final Fantasy Legend 2 Randomizer Version History
 
+Version 0.7.2 (8/9/2025):
+	Some more quality of life bugfixing:
+		Gold will now calculate correctly when multiple groups of enemies are defeated and meat/an item drops.
+		Multiple stats can grow after battle for a single character.
+			The chance to grow has also drastically increased.
+			The chance for mutants to change skills has also slightly increased.
+		Will now check for a correct rom.
+	
+Version 0.7.1 (7/22/2025):
+	Fixed an issue that was preventing writing out rom.
+
 Version 0.7.0 (7/21/2025):
 	Complete code overhaul. Will help with future feature development.
 	Mr. S will no longer block the starting entrance, incase you forget something in the starting cave.

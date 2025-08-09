@@ -1,4 +1,5 @@
 import mmap
+import hashlib
 import FFL2R_utils
 
 class ScriptBlock:
@@ -81,10 +82,7 @@ class ScriptBlock:
         return scriptList
 
     def insertIntoScript(self, index:int, position:int, insertion:list):
-        for k in self.script.keys():
-            if k == index:
-                key = k
-        self.script[key].scriptData = self.script[key].scriptData[:position] + insertion + self.script[key].scriptData[position:]
+        self.script[index].scriptData = self.script[index].scriptData[:position] + insertion + self.script[index].scriptData[position:]
 
 class Script:
     def __init__(self, array:list, header:int, location:int, bank:int):
@@ -124,7 +122,7 @@ class MapHeaderData:
             else:
                 isNPCs = False
             i+=1
-            if isDangerous == True:
+            if isDangerous:
                 encounterSet = rom[i]
                 i+=1
                 encounterRate = rom[i]
@@ -144,7 +142,7 @@ class MapHeaderData:
                     ref+=1
             else:
                 triggerRef = None
-            if isNPCs == True:
+            if isNPCs:
                 npcArray = []
                 npcgfx = []
                 while (rom[i] != 0xFF) and (len(npcgfx) <= 5):
@@ -171,16 +169,16 @@ class MapHeaderData:
     def findNPCs(self, findType:int)->list:
         npcList = []
         for k, v in self.header.items():
-            if v.isNPCs == True:
+            if v.isNPCs:
                 for npc in v.npcs:
                     match findType:
                         case 0:
                             pass
                         case 1:
-                            if type(npc) == list and npc[0] == 0x80 and npc[5] == 0xF9:
+                            if isinstance(npc, list) and npc[0] == 0x80 and npc[5] == 0xF9:
                                 npcList.append([k, v.npcs.index(npc), npc])
                         case 2: 
-                            if type(npc) == list and npc[0] == 0x80 and npc[5] == 0xFA:
+                            if isinstance(npc, list) and npc[0] == 0x80 and npc[5] == 0xFA:
                                 npcList.append([k, v.npcs.index(npc), npc])                        
         return npcList
     
@@ -423,8 +421,11 @@ class File:
 
     def readInRom(file:str)->mmap:
         with open(file, 'rb') as f:
-            romFile = mmap.mmap(f.fileno(), length=0, access=mmap.ACCESS_COPY,offset=0)
-        return romFile
+            rom = mmap.mmap(f.fileno(), length=0, access=mmap.ACCESS_COPY,offset=0)
+            hashCheck = hashlib.md5(rom)
+            if hashCheck.hexdigest() != "2bb0df1b672253aaa5f9caf9aab78224":
+                raise Exception("MD5 hash mismatch. Invalid Final Fantasy Legend 2 ROM file.")
+        return rom
 
     def writeOutRom(rom:mmap, seed:int, encounter:int, gold:int):
         print(f"""        Final Fantasy Legend 2 Randomizer Settings:
@@ -437,7 +438,7 @@ class File:
     def editRom(rom:mmap, script1:ScriptBlock, script2:ScriptBlock, menu:ScriptBlock, maps:MapHeaderData, 
                shops:ShopData, goldTable:GoldData, monsters:MonsterData)->mmap:
         def writeDataBlocks(rom:mmap, block:ScriptBlock):
-            for k,v in block.script.items():
+            for v in block.script.values():
                 #header write first
                 rom[v.headerAddr] = v.relAddr & FFL2R_utils.MAXINT
                 rom[v.headerAddr+1] = (v.relAddr >> FFL2R_utils.MAXINT.bit_length()) & FFL2R_utils.MAXINT
@@ -452,7 +453,7 @@ class File:
                  finalEntry+=1
 
         def writeMapHeaders(rom:mmap, maps:MapHeaderData):
-            for k,v in maps.header.items():
+            for v in maps.header.values():
                 i=0
                 rom[v.addr] = v.tileMap & FFL2R_utils.MAXINT
                 i+=1
@@ -462,7 +463,7 @@ class File:
                 i+=1
                 rom[v.addr+i] = v.flagsAndTriggerTiles
                 i+=1
-                if v.isDangerous == True:
+                if v.isDangerous:
                     rom[v.addr+i] = v.encounterSet
                     i+=1
                     rom[v.addr+i] = v.encounterRate
@@ -477,7 +478,7 @@ class File:
                         rom[v.addr+i] = v.triggerRef[ref][1]
                         i+=1
                         ref+=1
-                if v.isNPCs == True:
+                if v.isNPCs:
                     for gfx in v.npcgfx:
                         rom[v.addr+i] = gfx
                         i+=1
@@ -500,7 +501,7 @@ class File:
                     rom[k+x] = v.wares[x]
 
         def writeGoldTable(rom:mmap, goldTable:GoldData):
-            for k,v in goldTable.table.items():
+            for v in goldTable.table.values():
                 rom[v.addr] = v.firstByte
                 rom[v.addr+1] = v.secondByte
 

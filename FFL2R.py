@@ -62,8 +62,8 @@ def main(rom_path:str|None, seed:int|None, encounterRate:int|None, goldDrops:int
         goldDrops = FFL2R_utils.Utility.setBoundaries(goldDrops, 50, 500)
         goldAdjustment(goldTable, goldDrops)
     
-    for key, value in FFL2R_data.GameData.newItemPrices.items():
-         romData[key] = value
+    for k,v in FFL2R_data.GameData.newItemPrices.items():
+         romData[k] = v
     
     romData = FFL2R_io.File.editRom(romData, scriptingBlock1, scriptingBlock2, menuBlock, mapHeaders, shops, goldTable, monsterTable)
 
@@ -158,10 +158,20 @@ def preGame(scriptingBlock1:FFL2R_io.ScriptBlock, scriptingBlock2:FFL2R_io.Scrip
     mapHeaders.header[15].npcs[2][1] = 0x55
     mapHeaders.header[15].npcs[3][1] = 0x55
 
+    # memoset = scriptingBlock2.findScriptsByBytes([0x18])
+    # memoset.reverse()
+    # for cmd in memoset:
+    #     if cmd[0] not in (17, 236, 248, 74, 83):
+    #         del scriptingBlock2.script[cmd[0]].scriptData[cmd[1]:cmd[1]+2]
+    #         scriptingBlock2.addBytes(cmd[0], -2)
+
+
+
+
 def goldAdjustment(goldTable:FFL2R_io.GoldData, rate:int):
     percent = rate / 100
 
-    for k,v in goldTable.table.items():
+    for v in goldTable.table.values():
         gold = int(v.actualValue * percent)
         #10% stack bonus causes overflow issues, so capped at 59578
         if gold > 59578:
@@ -173,7 +183,7 @@ def encounterRateAdjustment(mapHeaders:FFL2R_io.MapHeaderData, rate:int):
     percent = rate / 100
 
     #if a map's encounter rate is 0, it winds up for a default encounter rate somehow. So it floors at 1.
-    for k,v in mapHeaders.header.items():
+    for v in mapHeaders.header.values():
         if v.isDangerous == True:
             v.encounterRate = int(v.encounterRate * percent)
             if v.encounterRate == 0:
@@ -209,7 +219,6 @@ def magiShuffle(scriptingBlock1:FFL2R_io.ScriptBlock, scriptingBlock2:FFL2R_io.S
             magiList.pop(0)
     scriptList = scriptingBlock2.findScriptsByBytes([0x19, 0x0A])
     for script in scriptList:
-        print(script)
         scriptingBlock2.script[script[0]].scriptData[script[1]+2] = magiList[0]
         if script[0] == 164: #leon's return cutscene
             leonsMagi = magiList[0] #leon's theft
@@ -237,7 +246,7 @@ def shopRando(shops:FFL2R_io.ShopData, tiers:list):
                 currentShop[i] = extraItems[1][0]
         return currentShop
 
-    for k,v in shops.data.items():
+    for v in shops.data.values():
         currentShop = [0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]
         length = random.randint(6,8)
         match v.tier:
