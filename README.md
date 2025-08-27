@@ -19,16 +19,15 @@
     - Elemental MAGI behaves appropriately.
     - Mana MAGI affinity enabled.
     - Mutant stat growth behaves as expected.
+    - Dooring/Pegasus/Teleporting during the race will now force a dismount.
 
-Known issue: Race sequence will be graphically odd, but does not do anything adverse. Fixed by simply dismounting/remounting the dragon for each leg. 
-
-## Version 0.7.2 (8/9/2025):
-- Some more quality of life bugfixing (thank you tehtmi!):
-	-	Gold will now calculate correctly when multiple groups of enemies are defeated and meat/an item drops.
-	-	Multiple stats can grow after battle for a single character.
-		-	The chance to grow has also drastically increased.
-		- 	The chance for mutants to change skills has also slightly increased.
--	Will now check for a correct rom.
+## Version 0.7.3 (8/27/2025):
+   - The Race has been reworked:
+      - If you teleport/door out during the race, you will now be dismounted.
+      	- The dragon will remain on the track when you return.
+        - It is not encouraged to switch mounts while racing, or you could end up with off-magi counts or other weirdness.
+      - When returning, dragon availability will depend on which magi have been acquired.
+   - Fixed the graphical issue introduced with the movement speed boost.
 
 
 ## How to:
