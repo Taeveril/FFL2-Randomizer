@@ -33,7 +33,6 @@ class Utility:
         #time being.
         moveHax = (
             #movement
-            0x01e3e,
             0x01e43,
             0x01e54
            )
@@ -238,3 +237,36 @@ class Utility:
     #         del scriptingBlock2.script[cmd[0]].scriptData[cmd[1]:cmd[1]+2]
     #         scriptingBlock2.addBytes(cmd[0], -2)
 
+
+    # print(f"""
+    # var-inc 1:{scriptingBlock1.findScriptsByBytes([0x12, 0x1f, 0x1])}
+    # var-inc 2:{scriptingBlock2.findScriptsByBytes([0x12, 0x1f, 0x1])}
+    # var-dec 1:{scriptingBlock1.findScriptsByBytes([0x13, 0x1f, 0x1])}
+    # var-dec 2:{scriptingBlock2.findScriptsByBytes([0x13, 0x1f, 0x1])}
+    # var-set 1:{scriptingBlock1.findScriptsByBytes([0x14, 0x1f, 0x1])}
+    # var-set 2:{scriptingBlock2.findScriptsByBytes([0x14, 0x1f, 0x1])}
+    # var-test 1:{scriptingBlock1.findScriptsByBytes([0x15, 0x1f, 0x1])}
+    # var-test 2:{scriptingBlock2.findScriptsByBytes([0x15, 0x1f, 0x1])}
+    # NPCs: {mapHeaders.findNPCs(0,31)}""")
+    #print(FFL2R_utils.Utility.listToHex(scriptingBlock1.script[55].scriptData))
+    #print(FFL2R_utils.Utility.listToHex(scriptingBlock1.script[56].scriptData))
+    #print(FFL2R_utils.Utility.listToHex(scriptingBlock1.script[57].scriptData))
+    #print(FFL2R_utils.Utility.listToHex(scriptingBlock1.script[58].scriptData))
+    #print(FFL2R_utils.Utility.listToHex(scriptingBlock1.script[59].scriptData))
+    #print(FFL2R_utils.Utility.listToHex(scriptingBlock1.script[78].scriptData))
+    #print(FFL2R_utils.Utility.listToHex(scriptingBlock1.script[80].scriptData))
+    #print(FFL2R_utils.Utility.listToHex(scriptingBlock1.script[95].scriptData))
+    #print(FFL2R_utils.Utility.listToHex(scriptingBlock2.script[193].scriptData))
+    #print(FFL2R_utils.Utility.listToHex(scriptingBlock2.script[201].scriptData))
+    #print(FFL2R_utils.Utility.listToHex(scriptingBlock2.script[202].scriptData))
+    #print(FFL2R_utils.Utility.listToHex(scriptingBlock2.script[203].scriptData))
+    #print(FFL2R_utils.Utility.listToHex(scriptingBlock2.script[204].scriptData))
+    #print(FFL2R_utils.Utility.listToHex(scriptingBlock2.script[205].scriptData))
+    #print(FFL2R_utils.Utility.listToHex(scriptingBlock2.script[206].scriptData))
+    #print(FFL2R_utils.Utility.listToHex(scriptingBlock2.script[207].scriptData))
+    #mapHeaders.findNPCs(3, 129)
+    #mapHeaders.findNPCs(3, 130)
+    #mapHeaders.findNPCs(3, 131)
+    #mapHeaders.findNPCs(3, 132)
+    #mapHeaders.findNPCs(3, 133)
+    #mapHeaders.findNPCs(3, 134)

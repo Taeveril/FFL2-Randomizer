@@ -1,12 +1,20 @@
 Final Fantasy Legend 2 Randomizer Version History
 
+Version 0.7.3 (8/27/2025):
+	The Race has been reworked:
+		If you teleport/door out during the race, you will now be dismounted.
+			The dragon will remain on the track when you return.
+			It is not encouraged to switch mounts while racing, or you could end up with off-magi counts or other weirdness.
+		When returning, dragon availability will depend on which magi have been acquired.
+		Fixed the graphical issue introduced with the movement speed boost.
+
 Version 0.7.2 (8/9/2025):
-	Some more quality of life bugfixing:
+	Some more quality of life bugfixing  (thank you tehtmi!):
 		Gold will now calculate correctly when multiple groups of enemies are defeated and meat/an item drops.
 		Multiple stats can grow after battle for a single character.
 			The chance to grow has also drastically increased.
 			The chance for mutants to change skills has also slightly increased.
-		Will now check for a correct rom.
+	Will now check for a correct rom.
 	
 Version 0.7.1 (7/22/2025):
 	Fixed an issue that was preventing writing out rom.

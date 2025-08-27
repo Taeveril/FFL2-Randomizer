@@ -166,20 +166,24 @@ class MapHeaderData:
             index+=1
         return hd
 
-    def findNPCs(self, findType:int)->list:
+    def findNPCs(self, findType:int, *varCheck:int)->list:
         npcList = []
         for k, v in self.header.items():
             if v.isNPCs:
                 for npc in v.npcs:
                     match findType:
                         case 0:
-                            pass
+                            if isinstance(npc, list) and ((npc[0] & 0x0f) | (((npc[0] & 0x10) >> 4) << 4)) == varCheck[0]:
+                                npcList.append([k, v.npcs.index(npc), npc])
                         case 1:
                             if isinstance(npc, list) and npc[0] == 0x80 and npc[5] == 0xF9:
                                 npcList.append([k, v.npcs.index(npc), npc])
                         case 2: 
                             if isinstance(npc, list) and npc[0] == 0x80 and npc[5] == 0xFA:
-                                npcList.append([k, v.npcs.index(npc), npc])                        
+                                npcList.append([k, v.npcs.index(npc), npc])
+                        case 3:
+                            if isinstance(npc, list) and k == varCheck[0]:
+                                print(f"{k} - {FFL2R_utils.Utility.listToHex(npc)}")
         return npcList
     
     def headerInfo(self, match:int):

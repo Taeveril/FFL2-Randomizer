@@ -1,0 +1,385 @@
+FFLegend 2 Variables + States
+By: Taeveril
+https://github.com/Taeveril/FFL2-Randomizer
+Ver 1 (08/24/25) - Initial findings
+
+
+Var Number:		0
+Purpose:		Guest Characters
+Comments:		This is a code-defined var where each state corresponds to a certain guest character. Setting the state turns that guest on.
+Maps w/ NPCs:	n/a
+States:
+0 - Off
+1 - Mr.S
+2 - Ki
+3 - Mask (No Equipment)
+4 - Mask (w/ Equipment)
+5 - Lynn (punch/kick)
+6 - Dad (gold/smg)
+7 - Lynn (headbutt/x-kick)
+8 - Hana
+9 - Taro
+10 - Dad (defend/vulcan)
+11 - Isis
+
+Var Number:		1
+Purpose:		First World and Ashura Tracking
+Comments:		
+Maps w/ NPCs: 	4, 5, 11, 12, 15, 16, 17, 18, 19, 20, 21, 38
+States:
+0 - Off
+1 - Incremented on Mini-D defeat
+2 - Set when Mr.S leaves / Mr.S blocks first cave
+3 - Set after talking to Ki / Unlocks ruins
+4 - Set after guardians take magi / prevents repeating scene
+5 - Set after guardians escape / door blocks forcing player to get magi
+6 - Set after dying words / prevents repetition
+7 - Set after Ki joins / Oddity that all of Ashura's Base's monster npc bumps check var 1 with a max state of 7?
+8 - Set after Rhino defeat / Prevents backtracking
+9 - Set after exiting Ashura's Base / Triggers Collapsing Cutscene
+10 - Collapsing cutscene
+11 - Collapsing cutscene
+12 - Ki leaving cutscene
+13 - Incremented to prevent repeat of leaving cutscene
+14 - Set after talking to Ashura / Sets Ki to be sick
+15 - Set after getting all magi in Ki's body
+
+Var Number:		2
+Purpose:		Mask Guest tracking
+Comments: 		
+Maps w/ NPCs: 	22, 33, 41
+States:
+0 - Off
+1 - Incremented after WoodMan defeat / Mask joins cutscene
+2 - Set after Mask joins / Used in equip check trigger tile
+3 - Set after Mask gets equipment (guest swap)
+4 - Set in script 27, shows Mask leaving cutscene
+5 - Mask leaves, prevents cutscene repeat
+6 - Set after meeting Dad in Giant World
+
+Var Number:		3
+Purpose:		Giant World Tracking
+Comments:
+Maps w/ NPCs:	39
+States:
+0 - Off
+1 - Incremented after talking to shopkeep / flags Johnny to speak
+2 - Set after speaking to Johnny / opens door to giant town
+3 - Set after discovering door / Removes invisible NPC that prevents entering
+
+Var Number:		4
+Purpose:		Apollo World / Lynn Tracking
+Comments:		
+Maps w/ NPCs:	55, 57, 69, 74
+States:
+0 - Off
+1 - Incremented by speaking to Apollo / Spawns in Lynn, Dunatis, and underwater passage.
+2 - Set after Lynn joins
+3 - Incremented after Dunatis / NPC flag off
+4 - Incremented after Dunatis / Cutscene start
+5 - Incremented after Cutscene / Cutscene Control
+6 - Set after Guardian Base is attacked / Lynn's mom changes to saying she's kidnapped
+7 - Set after Ninja is defeated / more Lynn's house cutscene control
+
+Var Number:		5
+Purpose:		TrueEye
+Comments:		The TrueEye Magi does not functionally do anything. This variable tracks when you can enter the light cave.
+Maps w/ NPCs:	65
+0 - Off
+1 - Set after opening fake Treasure Chest / Passes check and travels to visible light cave.
+
+Var Number:		6
+Purpose:		Guardian World Tracking
+Comments:
+Maps w/ NPCs:	86, 87, 88, 89, 90, 92, 93, 94
+0 - Off
+1 - Set after playing Heroic Tune
+2 - Set after released
+3 - Set after going to bed / After Guardian Base is attacked 
+4 - Set after defeating first monster
+5 - Set after Dad joins
+6 - Set after defeating second monster
+7 - Set after defeating third monster
+8 - Set after defeating last monster
+
+Var Number:		7
+Purpose:		Ninja World / Dad Death Cutscene Control
+Comments:
+Maps w/ NPCs: 	99
+0 - Off
+1 - Dad gifts Magi
+2 - Dad and Ninja vanish
+3 - Music Change
+4 - Lynn joins
+5 - Ninja reappears
+6 - Set after Ninja defeated
+7 - Lynn's mom gifts magi
+
+Var Number:		8
+Purpose:		Venus World / Race World Tracking
+Comments:		Apollo NPC in Race World actually uses var9/state0, which is how he vanishes after starting Edo.
+Maps w/ NPCs: 	102, 104, 106, 109, 123, 126, 129
+States:
+0 - None
+1 - Inc after talking to Venus / Lets you leave the city
+2 - Set after talking to Leon / Unblocks sewer
+3 - Set for volcano cutscene
+4 - Inc for volcano cutscene
+5 - Inc for volcano cutscene
+6 - Leon steals magi
+7 - Wedding start
+8 - Pre-venus Fight / Leon return magi check
+9 - Set after Venus' defeat
+10 - Venus World finish
+11 - Set after Dragon Race
+
+Var Number:		9
+Purpose:	Edo Tracking
+Comments:	Sho-gun's castle uses Var10
+Maps w/ NPCs:	130, 146, 147, 148, 151, 152, 154, 155, 156, 158, 211
+States: 
+0 - Off
+1 - Set after initial Hanamoto encounter
+2 - Set after talking to Hana for the first time
+3 - Set after bullying Echigoya
+4 - Set on ship when Hana joins
+5 - Inc start of courthouse cutscene
+6 - Inc part of courthouse cutscene
+7 - Inc part of courthouse cutscene
+8 - Inc end of courthouse scene
+9 - Not set?
+10 - Kame's injured cutscene / NPC control
+11 - Kame's injured cutscene / NPC control + Hana rejoins
+12 - Set after Echigoya encounter
+13 - Set after Taro joins
+14 - Not set?
+15 - Set after Magnate defeat / Edo finishes
+
+Var Number:		10
+Purpose:		Edo Castle Tracking
+Comments:
+Maps w/ NPCs:	137, 145
+States:
+0 - Off
+1 - Inc after Edo Castle Guards 
+2 - Sho-gun cutscene control
+3 - Sho-gun cutscene control
+4 - Set after Magnate Defeat / Edo Finishes
+
+Var Number:		11
+Purpose:		Should Odin offer to revive the player?
+Comments:		Special coded check, set after Odin fight
+Maps w/ NPCs:	171
+States:
+0 - Yes
+1 - No
+
+Var Number:		12
+Purpose:		Final World Tracking
+Comments: 
+Maps w/ NPCs:	174, 187
+0 - Off
+1 - Apollo/Minion Scene
+2 - Apollo/Minion Scene
+3 - Apollo/Minion Scene
+4 - Set after WarMech's defeat
+
+Var Number:		13
+Purpose:		Central Pillar Tracking
+Comments:
+Maps w/ NPCs:	192, 197, 200, 201
+States:
+0 - Off:
+1 - Set before Apollo battle
+2 - Incremented after Apollo battle
+3 - Set after talking to Dad
+4 - Set after Isis shrinks
+5 - Incremented after TianLung
+6 - Incremented after Fenrir
+7 - Set before arsenal
+8 - Incremented after arsenal 
+9 - Incremented after arsenal
+10 - Set after talking to Isis
+
+Var Number:		14
+Purpose:		Prism Magi Result
+Comments:		Special coded var, state sets the world's remaining magi called by prism.
+States:
+0 - First World
+1 - Ashura World
+2 - First World Return (ki's assistant has one)
+3 - Giant World
+4 - Ki's Body
+5 - Apollo's World
+6 - Guardian World
+7 - Ninja World
+8 - Apollo's World Return (Lynn's mom, a var4 state check)
+9 - Venus World
+10 - Race World
+11 - Edo
+12 - Nasty Dungeon
+13 - Valhalla
+14 - Final World "2"
+15 - Final World (actual)
+
+Var Number:		15
+Purpose:		Opening Cutscene / Player Treadmill
+Comments:		Sort of convoluted. This is used to treadmill through space in the central pillars.
+Maps w/ NPCs:
+States:
+0 - Off
+1 - Opening Cutscene Control
+2 - Opening Cutscene Control
+3 - Central Pillar space control. Pulls the player north into space.
+4 - Central Pillar space control. Pulls the player north into space.
+5 - Central Pillar space control. Pulls the player south into space.
+15 - Central Pillar space control. Pulls the player south into space.
+
+Var Number:		16
+Purpose:		Central Pillar door control
+Comments:		Doors to new worlds are blocked by an NPC that checks a player's magi total. Passing the check increments this state and
+				pulls the player through. Permanently set to state 1 when Isis joins. Also used in Ki's body to track magi acquired.
+Maps w/ NPCs:	15, 23, 39, 40, 47, 54, 56, 84, 100, 103, 112, 113, 125, 136, 161, 174, 175
+States:
+0 - Impassable
+1 - Passable
+
+Var Number:		17
+Purpose:		Generic NPC visibility control
+Comments:		Used when an NPC needs to appear and/or vanish and not be permanent -- usually cutscene related. Cutscenes may use more than just
+				states 0/1.
+Maps w/ NPCs:	1, 46, 115, 117, 118, 119, 120, 121, 122, 123, 131, 158, 174, 192, 202, 209, 212, 213, 213, 215, 216, 217, 218
+States:
+0 - Invisible
+1+ - Visible
+
+Var Number:		18
+Purpose:		Controls Dad visibility in Final World cutscene where Apollo steals magi.
+Comments:		...real waste of a variable this.
+Maps w/NPCs:	174
+States:
+0 - Invisible
+1 - Visible
+
+Var Number:		19
+Purpose:		Used to track which dragon you purchased. Also Ki's Body magi tracking.
+Comments:		19 is reset to 0 after race.
+Maps w/ NPCs:	48, 54, 132, 133, 134
+States:
+0 - Off
+1 - Fastest/1000g
+2 - Fast/800g
+3 - Slow/600g
+4 - Slowest/Free
+
+Var Number:		20
+Purpose:		Dragon Race/Ki's Body magi tracking.
+Comments:		
+Maps w/ NPCs:	49, 131
+States:
+0 - Off
+1 - On
+
+Var Number:		21
+Purpose:		Dragon Race/Ki's Body magi tracking.
+Comments:		
+Maps w/ NPCs:	50, 132
+States:
+0 - Off
+1 - On
+
+Var Number:		22
+Purpose:		Dragon Race/Ki's Body magi tracking.
+Comments:		
+Maps w/ NPCs:	51, 133
+States:
+0 - Off
+1 - On
+
+Var Number:		23
+Purpose:		Dragon Race/Ki's Body magi tracking.
+Comments:		
+Maps w/ NPCs:	52, 134
+States:
+0 - Off
+1 - On
+
+Var Number:		24
+Purpose:		Door/Teleport tracking
+Comments:		Each state corresponds to how many worlds are available for warping.  This corresponds to Menu script 47, and an assorted
+				number of Door(map) entries. These states are set at otherwise unintuitive moments. Also reveals the door-selling NPC in
+				every world to prevent players from really getting stuck.
+Maps w/ NPCs:	7, 10, 25, 28, 42, 59, 67, 85, 101, 107, 127, 153, 159, 202
+States:
+0 - First Town
+1 - Second Town
+2 - Shrine of Isis
+3 - Desert Town
+4 - Ashura's Town
+5 - Giants' Town
+6 - Lynn's Village
+7 - Port Town
+8 - Guardian's Town
+9 - Venus' City
+10 - Race Circuit
+11 - Edo
+12 - Nasty Dungeon
+13 - Valhalla Palace
+14 - Final Town
+15 - Central Shrine
+
+Var Number:		25
+Purpose:		Fake Dad in First Town tracking.
+Comments:		Prevents the scene repeating every time you enter First Town.
+Maps w/ NPCs:	6
+0 - Off
+1 - On
+
+Var Number:		26
+Purpose:		Ki's Body magi tracking.
+Comments:		
+Maps w/ NPCs:	53
+0 - Off
+1 - On
+
+Var Number:		27
+Purpose:		Tracks what the current guest prompt is.
+Comments:		Reset to 0 every time a guest joins. Not too rigorously used due to how hard it can be to track. 
+Maps w/ NPCs:	
+States:
+
+Var Number:		28
+Purpose:		None
+Comments:		Wholly unused variable in all the scripting.
+Maps w/ NPCs:	
+States:
+
+Var Number:		29
+Purpose:		Tracks if player is underwater in Apollo's world
+Comments:		Defeating Apollo increments it to 1 for some reason, while Apollo's World uses 0 or 2.
+Maps w/ NPCs:
+States:
+0 - Off
+2 - On
+
+Var Number:		30
+Purpose:		Sets Screen Effects
+Comments:		State 3 serves as an override.
+Maps w/ NPCs:	
+States:
+0 - Clear/None
+1 - Earthquake
+2 - Underwater
+3 - Clear
+
+Var Number:		31
+Purpose:		Dragon Race State Tracking
+Comments:		This variable is coded in asm and not really set in scripting, only ever checked. It winds up overlapping and running into 
+				var19 a lot.
+Maps w/ NPCs:
+States:
+0 - None
+1 - Fastest Dragon, 4 encounters
+2 - Fast Dragon, 3 encounters
+3 - Slow Dragon, 2 encounters
+4 - Slowest Dragonm 1 encounter
