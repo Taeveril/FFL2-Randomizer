@@ -29,14 +29,6 @@
 		- An NPC will let you teleport back into Ki's body after rescuing her.
 	- A lot of not-player-facing stuff is being reworked to better work future endeavors.
 
-## Version 0.7.3 (8/27/2025):
-   - The Race has been reworked:
-      - If you teleport/door out during the race, you will now be dismounted.
-      	- The dragon will remain on the track when you return.
-        - It is not encouraged to switch mounts while racing, or you could end up with off-magi counts or other weirdness.
-      - When returning, dragon availability will depend on which magi have been acquired.
-   - Fixed the graphical issue introduced with the movement speed boost.
-
 
 ## How to:
 - Download the Python scripts (and install Python if you don't have it).
