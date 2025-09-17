@@ -82,7 +82,16 @@ class ScriptBlock:
         return scriptList
 
     def insertIntoScript(self, index:int, position:int, insertion:list):
+        oldLength = len(self.script[index].scriptData)
         self.script[index].scriptData = self.script[index].scriptData[:position] + insertion + self.script[index].scriptData[position:]
+        newLength = len(self.script[index].scriptData)
+        change = newLength - oldLength
+        self.addBytes(index, change)
+
+    def replaceScript(self, index:int, data:list):
+        byteChange = len(data) - len(self.script[index].scriptData)
+        self.script[index].scriptData = data
+        self.addBytes(index, byteChange)   
 
 class Script:
     def __init__(self, array:list, header:int, location:int, bank:int):
@@ -92,17 +101,23 @@ class Script:
         self.scriptData = array
 
 
-class MapHeaderData:
-    def __init__(self, rom:mmap, startAddr:int, endAddr:int):
-        self.startAddr = startAddr
-        self.endAddr = endAddr
+class MapData:
+    def __init__(self, rom:mmap, headerStartAddr:int, headerEmptyAddr:int, headerEndAddr:int, doorFirstStartAddr:int, doorSecondStartAddr:int, doorEndAddr:int):
+        self.headerStartAddr = headerStartAddr
+        self.headerEmptyAddr = headerEmptyAddr
+        self.headerEndAddr = headerEndAddr
         self.header = self.getHeaderData(rom)
+        self.doorFirstStartAddr = doorFirstStartAddr
+        self.doorSecondStartAddr = doorSecondStartAddr
+        self.doorEndAddr = doorEndAddr
+        self.doors = self.getDoors(rom)
+
 
     def getHeaderData(self, rom:mmap)->dict:
-        i = self.startAddr
+        i = self.headerStartAddr
         hd = {}
         index = 0
-        while i <= self.endAddr:
+        while i <= self.headerEmptyAddr:
             k=i
             tileMap = rom[i+1]<< FFL2R_utils.MAXINT.bit_length() | rom[i]
             i+=2
@@ -173,7 +188,7 @@ class MapHeaderData:
                 for npc in v.npcs:
                     match findType:
                         case 0:
-                            if isinstance(npc, list) and ((npc[0] & 0x0f) | (((npc[0] & 0x10) >> 4) << 4)) == varCheck[0]:
+                            if isinstance(npc, list) and ((npc[0] & 0x0f) | (((npc[0] & 0x1f) >> 4) << 4)) == varCheck[0]:
                                 npcList.append([k, v.npcs.index(npc), npc])
                         case 1:
                             if isinstance(npc, list) and npc[0] == 0x80 and npc[5] == 0xF9:
@@ -203,9 +218,115 @@ class MapHeaderData:
     Is NPCs: {v.isNPCs}
     Trigger Count: {v.triggerCount}
     Triggers: {v.triggerRef}
-    NPCGFX: {v.npcgfx}
-    NPCs: {v.npcs}"""
+    NPCGFX: {[hex(x) for x in v.npcgfx]}
+    NPCs: {[[hex(y) for y in x] for x in v.npcs if type(x) == list]}"""
                 )
+
+    def addNPC(self, index:int, gfx: int, npc:list):
+        totalShift = 6
+        if gfx != 0:
+            self.header[index].npcgfx.pop()
+            self.header[index].npcgfx.append(gfx)
+            if len(self.header[index].npcgfx) < 6:
+                self.header[index].npcgfx.append(0xFF)
+                totalShift = 7
+        self.header[index].npcs.pop()
+        self.header[index].npcs.append(npc)
+        self.header[index].npcs.append(0xFF)
+        for v in self.doors.values():
+            if v.map > index:
+                v.addr+=totalShift
+
+    def delNPC(self, index:int, amount:list):
+        self.header[index].npcs.pop()
+        for i in range(amount):
+            self.header[index].npcs.pop()
+        self.header[index].npcs.append(0xFF)
+        for v in self.doors.values():
+            if v.map > index:
+                v.addr-=(amount*6)
+
+    def getDoors(self, rom:mmap)->dict:
+        indexer = 0
+        d = {}
+        i = self.doorFirstStartAddr
+        dataBlock = 1
+        while i < self.doorEndAddr:
+            dataLoc = i
+            mapAddr = rom[i+1] << FFL2R_utils.MAXINT.bit_length() | rom[i]
+            i+=2
+            xval = self.findCoordinate(rom[i])
+            #south = 0, north = 1, west = 2, east = 3
+            direction = self.remainingBytes(rom[i], xval)
+            i+=1
+            yval = self.findCoordinate(rom[i])
+            soundAndFlag = self.remainingBytes(rom[i], yval)
+            mysteryFlag = bool(soundAndFlag % 2)
+            doorSound = bool(soundAndFlag >> 1)
+            mapIndex = self.getMapForDoor(mapAddr)
+            d[indexer] = Door(mapAddr, mapIndex, xval, direction, yval, mysteryFlag, doorSound, dataBlock, dataLoc)
+            i+=1
+            indexer+=1
+            if i == self.headerStartAddr:
+                i = self.doorSecondStartAddr
+                dataBlock = 2
+        return d
+
+    def getMapForDoor(self, loc:int)->int:
+        index = 0
+        for k,v in self.header.items():
+            if v.addr == (loc + 0x18000):
+                index = k
+        return index
+            
+    def findCoordinate(self, byte:int)->int:
+        return ((byte & 0x3f) | (((byte & 0x3f) >> 4) << 4))
+
+    def remainingBytes(self, byte:int, sub:int)->int:
+        return ((byte - sub) & 0xf0) >> 6
+
+    def doorInfo(self, match:int):
+        for k,v in self.doors.items():
+            if k == match or v.addr == match:
+                print(f"""
+    Index: {k}
+    Addr: {hex(v.addr)}
+    Map: {v.map}
+    X: {v.x}
+    Y: {v.y}
+    Direction: {v.direction}
+    Mystery Flag: {v.mysteryFlag}
+    Door Sound: {v.doorSound}
+    Data Block: {v.dataBlock}
+    Location in ROM: {hex(v.loc)}"""
+                )
+
+class Door:
+    def __init__(self, addr:int, mapIndex:int, x:int, dirEnum:int, y:int, flag:bool, sound:bool, block:int, loc:int):
+        self.addr = addr
+        self.map = mapIndex
+        self.x = x
+        self.dirEnum = dirEnum
+        self.direction = self.getDirection(self.dirEnum)
+        self.y = y
+        self.mysteryFlag = flag
+        self.doorSound = sound
+        self.dataBlock = block
+        self.loc = loc
+
+    def getDirection(self, direction:int)->str:
+        match direction:
+            case 0:
+                return "South"
+            case 1:
+                return "North"
+            case 2:
+                return "West"
+            case 3:
+                return "East"
+            case _:
+                return "Err"
+
 
 class MapHeader:
     def __init__(self, addr:int, tileMap:int, tileSet:int, flagsAndTriggerTiles:int, triggerTileCount:int, animSpeed: int, isDangerous:bool, encounterSet:int|None, encounterRate:int|None ,isNPCs:bool, 
@@ -439,7 +560,7 @@ class File:
         with open('Final Fantasy Legend 2 - ' + str(seed) + '.gb', 'xb') as f:
             f.write(rom)
 
-    def editRom(rom:mmap, script1:ScriptBlock, script2:ScriptBlock, menu:ScriptBlock, maps:MapHeaderData, 
+    def editRom(rom:mmap, script1:ScriptBlock, script2:ScriptBlock, menu:ScriptBlock, maps:MapData, 
                shops:ShopData, goldTable:GoldData, monsters:MonsterData)->mmap:
         def writeDataBlocks(rom:mmap, block:ScriptBlock):
             for v in block.script.values():
@@ -456,48 +577,71 @@ class File:
                  rom[finalEntry] = 0x00
                  finalEntry+=1
 
-        def writeMapHeaders(rom:mmap, maps:MapHeaderData):
+        def writeMaps(rom:mmap, maps:MapData):
+            i = maps.headerStartAddr
             for v in maps.header.values():
-                i=0
-                rom[v.addr] = v.tileMap & FFL2R_utils.MAXINT
+                rom[i] = v.tileMap & FFL2R_utils.MAXINT
                 i+=1
-                rom[v.addr+i] = (v.tileMap >> FFL2R_utils.MAXINT.bit_length()) & FFL2R_utils.MAXINT
+                rom[i] = (v.tileMap >> FFL2R_utils.MAXINT.bit_length()) & FFL2R_utils.MAXINT
                 i+=1
-                rom[v.addr+i] = v.tileSet
+                rom[i] = v.tileSet
                 i+=1
-                rom[v.addr+i] = v.flagsAndTriggerTiles
+                rom[i] = v.flagsAndTriggerTiles
                 i+=1
                 if v.isDangerous:
-                    rom[v.addr+i] = v.encounterSet
+                    rom[i] = v.encounterSet
                     i+=1
-                    rom[v.addr+i] = v.encounterRate
+                    rom[i] = v.encounterRate
                     i+=1
-                rom[v.addr+i] = v.triggerCount
+                rom[i] = v.triggerCount
                 i+=1    
                 if v.triggerCount > 0x00:
                     ref = 0x00
                     while ref < v.triggerCount:
-                        rom[v.addr+i] = v.triggerRef[ref][0]
+                        rom[i] = v.triggerRef[ref][0]
                         i+=1
-                        rom[v.addr+i] = v.triggerRef[ref][1]
+                        rom[i] = v.triggerRef[ref][1]
                         i+=1
                         ref+=1
                 if v.isNPCs:
                     for gfx in v.npcgfx:
-                        rom[v.addr+i] = gfx
+                        rom[i] = gfx
                         i+=1
                     for npcs in v.npcs:
                         if type(npcs) == list:
-                            rom[v.addr+i] = npcs[0]
-                            rom[v.addr+i+1] = npcs[1]
-                            rom[v.addr+i+2] = npcs[2]
-                            rom[v.addr+i+3] = npcs[3]
-                            rom[v.addr+i+4] = npcs[4]
-                            rom[v.addr+i+5] = npcs[5]
+                            rom[i] = npcs[0]
+                            rom[i+1] = npcs[1]
+                            rom[i+2] = npcs[2]
+                            rom[i+3] = npcs[3]
+                            rom[i+4] = npcs[4]
+                            rom[i+5] = npcs[5]
                             i+=6
                         else:
-                            rom[v.addr+i] = npcs
+                            rom[i] = npcs
                             i+=1
+            while i <= maps.headerEndAddr:
+                rom[i] = 0x00
+                i+=1
+            for v in maps.doors.values():
+                rom[v.loc] = v.addr & FFL2R_utils.MAXINT
+                rom[v.loc+1] = (v.addr >> FFL2R_utils.MAXINT.bit_length()) & FFL2R_utils.MAXINT
+                rom[v.loc+2] = v.x
+                match v.dirEnum:
+                    case 0: #south
+                        pass
+                    case 1: #north
+                        rom[v.loc+2]+=0x40
+                    case 2: #west
+                        rom[v.loc+2]+=0x80
+                    case 3: #east
+                        rom[v.loc+2]+=0xc0
+                rom[v.loc+3] = v.y
+                if v.mysteryFlag == True:
+                    rom[v.loc+3]+=0x40
+                if v.doorSound == True:
+                    rom[v.loc+3]+=0x80
+
+
         
         def writeShops(rom:mmap, shops:ShopData):
             for k,v in shops.data.items():
@@ -527,7 +671,7 @@ class File:
         writeDataBlocks(rom, script2)
         writeDataBlocks(rom, menu)
 
-        writeMapHeaders(rom, maps)
+        writeMaps(rom, maps)
 
         writeShops(rom, shops)
 
