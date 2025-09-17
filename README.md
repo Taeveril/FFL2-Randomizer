@@ -14,12 +14,20 @@
   - Default fast text speed.
   - Mr. S will no longer block the first cave entrance upon completion.
   - Better stat growth.
+  - NPCs added to help access one-time or limited-time areas.
   - Game bug fixes:
     - Gold/Meat/Item drops now calculate correctly.
     - Elemental MAGI behaves appropriately.
     - Mana MAGI affinity enabled.
     - Mutant stat growth behaves as expected.
     - Dooring/Pegasus/Teleporting during the race will now force a dismount.
+
+## Version 0.8 (9/17/2025):
+  - Added NPCs will now let you access things previously closed off:
+    - After Ki leaves, an NPC next to the first world central pillar will let you revisit Ashura's Base.
+		- An NPC will sell Echigoya's wares after he abandons his conuter.
+		- An NPC will let you teleport back into Ki's body after rescuing her.
+	- A lot of not-player-facing stuff is being reworked to better work future endeavors.
 
 ## Version 0.7.3 (8/27/2025):
    - The Race has been reworked:
