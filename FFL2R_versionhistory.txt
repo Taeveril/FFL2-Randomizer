@@ -1,5 +1,12 @@
 Final Fantasy Legend 2 Randomizer Version History
 
+Version 0.8 (9/17/2025):
+	Added NPCs will now let you access things previously closed off:
+		After Ki leaves, an NPC next to the first world central pillar will let you revisit Ashura's Base.
+		An NPC will sell Echigoya's wares after he abandons his conuter.
+		An NPC will let you teleport back into Ki's body after rescuing her.
+	A lot of not-player-facing stuff is being reworked to better work future endeavors.
+		
 Version 0.7.3 (8/27/2025):
 	The Race has been reworked:
 		If you teleport/door out during the race, you will now be dismounted.
