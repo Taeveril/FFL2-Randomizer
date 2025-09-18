@@ -1,4 +1,3 @@
-from email import header
 import random
 import FFL2R_data
 import FFL2R_utils
@@ -226,4 +225,5 @@ if __name__ == "__main__":
     parser.add_argument('-g', '--gold_drops', type=int)
     args = parser.parse_args()
     main(rom_path = args.rom_path, seed=args.seed, encounterRate=args.encounter_rate, goldDrops=args.gold_drops)
+
 
