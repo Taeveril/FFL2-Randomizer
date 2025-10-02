@@ -49,17 +49,6 @@ class ScriptedFixes:
     def __init__(self):
         pass
 
-    def newDropScripts(scriptingBlock1:FFL2R_io.ScriptBlock, scriptingBlock2:FFL2R_io.ScriptBlock):
-        #gives Ashura and Venus new magi drop scripts
-        scriptingBlock1.addNewScript([0x19, 0x0A, 0x00, 0x19, 0x0A, 0x01, 0x19, 0x0A, 0x02, 0x19, 0x0A, 0x04, 0x19, 0x0A, 0x05, 0x19, 0x0A, 
-                                      0x06, 0x19, 0x0A, 0x07, 0x00])
-        scriptingBlock1.addNewScript([0x19, 0x0A, 0x00, 0x19, 0x0A, 0x01, 0x19, 0x0A, 0x02, 0x19, 0x0A, 0x04, 0x19, 0x0A, 0x05, 0x19, 0x0A, 
-                                      0x06, 0x19, 0x0A, 0x07, 0x00])
-        #ashura
-        scriptingBlock2.script[77].scriptData[348] = 0xC0
-        #venus
-        scriptingBlock1.script[43].scriptData[105] = 0xC1
-
     def centralPillarUnlocks(scriptingBlock1:FFL2R_io.ScriptBlock, mapHeaders:FFL2R_io.MapData):
     # All MAGI checks are an invisible npc that otherwise halts the player if they fail to meet the requirement -- "We need more MAGI to open this door!"
     # this can put the player in a rough state if the player Teleports/Pegasus/ItemDoor's to a world where they cannot escape, usually happens when 

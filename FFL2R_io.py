@@ -2,45 +2,33 @@ import mmap
 import hashlib
 import FFL2R_utils
 
+FFL2_HASH = "2bb0df1b672253aaa5f9caf9aab78224"
+
 class ScriptBlock:
     def __init__(self, rom:mmap, startAddr:int, endAddr:int, bankOffset:int):
         self.startAddr = startAddr
         self.endAddr = endAddr
         self.bankOffset = bankOffset
-        self.headerEnd = self.getHeaderEnd(rom)
-        self.headerBlock = self.getHeaderBlock(rom)
+        self.headerData = Header(rom, self.startAddr, self.bankOffset)
         self.newScriptPlacement = 0x00000
         self.script = self.getData(rom)
-        self.currentOffset = 0
-
-    def getHeaderEnd(self, rom:mmap)->int:
-        return (rom[self.startAddr+1] << FFL2R_utils.MAXINT.bit_length() | rom[self.startAddr]) + self.bankOffset
-
-    def getHeaderBlock(self, rom:mmap)->dict:
-        header = {}
-        i=self.startAddr
-        while i<self.headerEnd:
-            header[i] = rom[i+1] << FFL2R_utils.MAXINT.bit_length() | rom[i]
-            i+=2
-        return header
 
     def getData(self, rom:mmap)->dict:
         blockLast = self.endAddr
         d = {}
-        indexer=0
-        for k,v in self.headerBlock.items():
-            if k != self.headerEnd - 2:
-                length = self.headerBlock[k+2] - v
+        for loc in self.headerData.addr:
+            indexer = self.headerData.addr.index(loc)
+            if indexer+1 < len(self.headerData.addr):
+                length = self.headerData.addr[indexer+1] - loc
             else:
                 while rom[blockLast] == 0x00:
                     blockLast-=1
                 #all scripts must end with a 0x00
-                length = blockLast - (v+self.bankOffset) +2
+                length = blockLast - (loc + self.bankOffset) +2
                 self.newScriptPlacement = blockLast + 2
-            scriptData = self.getScriptData(rom, v, length)
-            script = Script(scriptData, k, v, self.bankOffset)
+            scriptData = self.getScriptData(rom, loc, length)
+            script = Script(scriptData, self.headerData.blockStart+(indexer*2), loc, self.bankOffset)
             d[indexer] = script
-            indexer+=1
         return d
 
     def getScriptData(self, rom:mmap, addr:int, length:int)->list:
@@ -63,7 +51,6 @@ class ScriptBlock:
         newHeaderAddr = self.script[k].headerAddr + 2
         newRelAddr = self.script[k].relAddr + len(self.script[k].scriptData)
         self.script[newIndexer] = Script(hexes, newHeaderAddr, newRelAddr, self.bankOffset)
-        self.currentOffset + 2
 
     def addBytes(self, targetScriptIndex:int, amount:int):
         for k in self.script.keys():
@@ -88,6 +75,13 @@ class ScriptBlock:
         change = newLength - oldLength
         self.addBytes(index, change)
 
+    def removeFromScript(self, index:int, positionStart:int, positionEnd:int):
+        oldLength = len(self.script[index].scriptData)
+        del self.script[index].scriptData[positionStart:positionEnd]
+        newLength = len(self.script[index].scriptData)
+        change = newLength - oldLength
+        self.addBytes(index, change)
+
     def replaceScript(self, index:int, data:list):
         byteChange = len(data) - len(self.script[index].scriptData)
         self.script[index].scriptData = data
@@ -100,9 +94,30 @@ class Script:
         self.addr = self.relAddr + bank
         self.scriptData = array
 
+class Header:
+    def __init__(self, rom:mmap, blockStart:int, offset:int):
+        self.blockStart = blockStart
+        self.offset = offset
+        self.blockEnd = self.getBlockEnd(rom)
+        self.addr = self.getAddr(rom)
+
+    def getBlockEnd(self, rom:mmap)->int:
+        return ((rom[self.blockStart+1] << FFL2R_utils.MAXINT.bit_length() | rom[self.blockStart]) + self.offset) - 1
+
+    def getAddr(self, rom:mmap)->list:
+        addrList = []
+        i=self.blockStart
+        while i<= self.blockEnd:
+            addrList.append(rom[i+1]<< FFL2R_utils.MAXINT.bit_length() | rom[i])
+            i+=2
+        return addrList
+
+    def literalAddr(self, index:int)->int:
+        return self.addr[index] + self.offset
 
 class MapData:
-    def __init__(self, rom:mmap, headerStartAddr:int, headerEmptyAddr:int, headerEndAddr:int, doorFirstStartAddr:int, doorSecondStartAddr:int, doorEndAddr:int):
+    def __init__(self, rom:mmap, headerStartAddr:int, headerEmptyAddr:int, headerEndAddr:int, doorFirstStartAddr:int, doorSecondStartAddr:int, 
+                 doorEndAddr:int):
         self.headerStartAddr = headerStartAddr
         self.headerEmptyAddr = headerEmptyAddr
         self.headerEndAddr = headerEndAddr
@@ -111,7 +126,6 @@ class MapData:
         self.doorSecondStartAddr = doorSecondStartAddr
         self.doorEndAddr = doorEndAddr
         self.doors = self.getDoors(rom)
-
 
     def getHeaderData(self, rom:mmap)->dict:
         i = self.headerStartAddr
@@ -255,12 +269,12 @@ class MapData:
             dataLoc = i
             mapAddr = rom[i+1] << FFL2R_utils.MAXINT.bit_length() | rom[i]
             i+=2
-            xval = self.findCoordinate(rom[i])
+            xval = FFL2R_utils.Utility.findCoordinate(rom[i])
             #south = 0, north = 1, west = 2, east = 3
-            direction = self.remainingBytes(rom[i], xval)
+            direction = FFL2R_utils.Utility.remainingBytes(rom[i], xval)
             i+=1
-            yval = self.findCoordinate(rom[i])
-            soundAndFlag = self.remainingBytes(rom[i], yval)
+            yval = FFL2R_utils.Utility.findCoordinate(rom[i])
+            soundAndFlag = FFL2R_utils.Utility.remainingBytes(rom[i], yval)
             mysteryFlag = bool(soundAndFlag % 2)
             doorSound = bool(soundAndFlag >> 1)
             mapIndex = self.getMapForDoor(mapAddr)
@@ -279,12 +293,6 @@ class MapData:
                 index = k
         return index
             
-    def findCoordinate(self, byte:int)->int:
-        return ((byte & 0x3f) | (((byte & 0x3f) >> 4) << 4))
-
-    def remainingBytes(self, byte:int, sub:int)->int:
-        return ((byte - sub) & 0xf0) >> 6
-
     def doorInfo(self, match:int):
         for k,v in self.doors.items():
             if k == match or v.addr == match:
@@ -329,8 +337,9 @@ class Door:
 
 
 class MapHeader:
-    def __init__(self, addr:int, tileMap:int, tileSet:int, flagsAndTriggerTiles:int, triggerTileCount:int, animSpeed: int, isDangerous:bool, encounterSet:int|None, encounterRate:int|None ,isNPCs:bool, 
-                 triggerCount:int, triggerRef:list|None, npcgfx:list|None, npcs:list|None):
+    def __init__(self, addr:int, tileMap:int, tileSet:int, flagsAndTriggerTiles:int, triggerTileCount:int, animSpeed: int, isDangerous:bool, 
+                 encounterSet:int|None, encounterRate:int|None ,isNPCs:bool, triggerCount:int, triggerRef:list|None, npcgfx:list|None, 
+                 npcs:list|None):
         self.addr = addr
         self.tileMap = tileMap
         self.tileSet = tileSet
@@ -383,8 +392,8 @@ class MonsterData:
         return md
        
 class Monster:
-    def __init__(self, monsterFamily:int, monsterAI:int, monsterGFX:int, monsterNPC:int, statAddr:int, stats:list, nameAddr:int, name:list, skillLoc:int, skillLength:int, 
-                 skills:list, goldIndex:int):
+    def __init__(self, monsterFamily:int, monsterAI:int, monsterGFX:int, monsterNPC:int, statAddr:int, stats:list, nameAddr:int, name:list, 
+                 skillLoc:int, skillLength:int, skills:list, goldIndex:int):
         self.monsterFamily = monsterFamily
         self.monsterAI = monsterAI
         self.monsterGFX = monsterGFX
@@ -548,7 +557,7 @@ class File:
         with open(file, 'rb') as f:
             rom = mmap.mmap(f.fileno(), length=0, access=mmap.ACCESS_COPY,offset=0)
             hashCheck = hashlib.md5(rom)
-            if hashCheck.hexdigest() != "2bb0df1b672253aaa5f9caf9aab78224":
+            if hashCheck.hexdigest() != FFL2_HASH:
                 raise Exception("MD5 hash mismatch. Invalid Final Fantasy Legend 2 ROM file.")
         return rom
 
@@ -560,7 +569,7 @@ class File:
         with open('Final Fantasy Legend 2 - ' + str(seed) + '.gb', 'xb') as f:
             f.write(rom)
 
-    def editRom(rom:mmap, script1:ScriptBlock, script2:ScriptBlock, menu:ScriptBlock, maps:MapData, 
+    def editRom(rom:mmap, script1:ScriptBlock, script2:ScriptBlock, menu:ScriptBlock, memo:ScriptBlock, maps:MapData,
                shops:ShopData, goldTable:GoldData, monsters:MonsterData)->mmap:
         def writeDataBlocks(rom:mmap, block:ScriptBlock):
             for v in block.script.values():
@@ -640,9 +649,7 @@ class File:
                     rom[v.loc+3]+=0x40
                 if v.doorSound == True:
                     rom[v.loc+3]+=0x80
-
-
-        
+    
         def writeShops(rom:mmap, shops:ShopData):
             for k,v in shops.data.items():
                 for x in range(0,8):
@@ -670,6 +677,7 @@ class File:
         writeDataBlocks(rom, script1)
         writeDataBlocks(rom, script2)
         writeDataBlocks(rom, menu)
+        writeDataBlocks(rom, memo)
 
         writeMaps(rom, maps)
 

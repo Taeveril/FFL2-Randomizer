@@ -35,6 +35,8 @@ def main(rom_path:str|None, seed:int|None, encounterRate:int|None, goldDrops:int
     if not goldDrops:
         goldDrops = int(input("Gold adjustment please, 50-500. (Gold dropped is currently capped at 65535.) "))
 
+    treasureFlagReclaim = []
+    
     romData = FFL2R_io.File.readInRom(gameFile)
 
     FFL2R_bugfixes.AssemblyFixes.missingTrigger(romData)
@@ -54,17 +56,28 @@ def main(rom_path:str|None, seed:int|None, encounterRate:int|None, goldDrops:int
     shops = FFL2R_io.ShopData(romData, 0x3f9e0, 0x3fa9f)
     goldTable = FFL2R_io.GoldData(romData, 0x33e50, 0x33e7f)
     monsterTable = FFL2R_io.MonsterData(romData, 0x33800, 0x33d50, 0x36400, 0x36b70, 0x36f80, 0x3eec0, 0x33c50)
+    memoBlock = FFL2R_io.ScriptBlock(romData, 0x3c250, 0x3e07f, 0x38000)
+    memoBlock.headerData.blockStart = 0x3c270
+    memoBlock.headerData.blockEnd = 0x3c46f
+    memoBlock.headerData.addr = memoBlock.headerData.getAddr(romData)
+    memoBlock.script = memoBlock.getData(romData)
 
-    FFL2R_bugfixes.ScriptedFixes.newDropScripts(scriptingBlock1, scriptingBlock2)
     FFL2R_bugfixes.ScriptedFixes.centralPillarUnlocks(scriptingBlock1, maps)
     FFL2R_bugfixes.ScriptedFixes.moveMrS(scriptingBlock1, maps)
     FFL2R_bugfixes.ScriptedFixes.fixTheRace(scriptingBlock1, scriptingBlock2, maps)
 
+    FFL2R_utils.GamePrep.newTitleScreen(menuBlock, VERSION, gameSeed)
+    FFL2R_utils.GamePrep.newDropScripts(scriptingBlock1, scriptingBlock2)
+    FFL2R_utils.GamePrep.kiShrineCleanup(scriptingBlock1, scriptingBlock2, maps)
+    FFL2R_utils.GamePrep.memoRemove(scriptingBlock1, scriptingBlock2, menuBlock, memoBlock, romData)
+
     FFL2R_qol.ScriptedQOL.newNPCHelpers(scriptingBlock1, scriptingBlock2, maps)
 
     magiShuffle(scriptingBlock1, scriptingBlock2, maps, FFL2R_data.GameData.magi)
-    treasureShuffle(maps, FFL2R_data.GameData.treasures)
+    treasureShuffle(maps, scriptingBlock2, FFL2R_data.GameData.treasures, treasureFlagReclaim)
     shopRando(shops, FFL2R_data.GameData.shopTiers)
+
+    FFL2R_utils.GamePrep.convertToRealChests(scriptingBlock1, maps, treasureFlagReclaim)
 
     newStarters(monsterTable, menuBlock)
 
@@ -79,13 +92,11 @@ def main(rom_path:str|None, seed:int|None, encounterRate:int|None, goldDrops:int
     for k,v in FFL2R_data.GameData.newItemPrices.items():
          romData[k] = v
 
-    FFL2R_utils.Utility.newTitleScreen(menuBlock, VERSION, gameSeed)
-
-    romData = FFL2R_io.File.editRom(romData, scriptingBlock1, scriptingBlock2, menuBlock, maps, shops, goldTable, monsterTable)
+    romData = FFL2R_io.File.editRom(romData, scriptingBlock1, scriptingBlock2, menuBlock, memoBlock, maps, shops, goldTable, 
+                                    monsterTable)
 
     FFL2R_io.File.writeOutRom(romData, gameSeed, encounterRate, goldDrops)
-
-    print ("Done!")
+    print("Done!")
 
 def goldAdjustment(goldTable:FFL2R_io.GoldData, rate:int):
     percent = rate / 100
@@ -98,17 +109,17 @@ def goldAdjustment(goldTable:FFL2R_io.GoldData, rate:int):
         v.actualValue = gold
         v.updateGold(gold)
 
-def encounterRateAdjustment(mapHeaders:FFL2R_io.MapData, rate:int):
+def encounterRateAdjustment(maps:FFL2R_io.MapData, rate:int):
     percent = rate / 100
 
     #if a map's encounter rate is 0, it winds up for a default encounter rate somehow. So it floors at 1.
-    for v in mapHeaders.header.values():
+    for v in maps.header.values():
         if v.isDangerous == True:
             v.encounterRate = int(v.encounterRate * percent)
             if v.encounterRate == 0:
                 v.encounterRate = 1
 
-def treasureShuffle(mapHeaders:FFL2R_io.MapData, treasures:list):
+def treasureShuffle(mapHeaders:FFL2R_io.MapData, scriptingBlock2:FFL2R_io.ScriptBlock, treasures:list, treasureFlagReclaim:list):
     treasuresList = treasures
     random.shuffle(treasuresList)
     #0=npc, 1=treasures, 2=magi
@@ -116,10 +127,15 @@ def treasureShuffle(mapHeaders:FFL2R_io.MapData, treasures:list):
     for chest in treasureChests:
         chest[2][4] = treasuresList[0]
         if treasuresList[0] == 0xFF:
-            #show empty
-            chest[2][2]+=64
+            x = FFL2R_utils.Utility.findCoordinate(chest[2][2])
+            y = FFL2R_utils.Utility.findCoordinate(chest[2][3])
+            treasureFlagReclaim.append(chest[2][1])
+            chest[2] = [0x0, 0xf, x+0x40, y+0xc0, 0x3, 0xf1]
         treasuresList.pop(0)
         mapHeaders.header[chest[0]].npcs[chest[1]] = chest[2]
+    startGift = random.randint(0, len(FFL2R_data.GameData.itemList))
+    scriptingBlock2.script[19].scriptData[26] = FFL2R_data.GameData.itemList[startGift]
+    scriptingBlock2.script[19].scriptData[41] = FFL2R_data.GameData.itemList[startGift]
 
 def magiShuffle(scriptingBlock1:FFL2R_io.ScriptBlock, scriptingBlock2:FFL2R_io.ScriptBlock, mapHeaders:FFL2R_io.MapData, magi:list):
     magiList = magi
@@ -141,8 +157,7 @@ def magiShuffle(scriptingBlock1:FFL2R_io.ScriptBlock, scriptingBlock2:FFL2R_io.S
         scriptingBlock2.script[script[0]].scriptData[script[1]+2] = magiList[0]
         if script[0] == 164: #leon's return cutscene
             leonsMagi = magiList[0] #leon's theft
-            #any script edits should all equally be the same 106 bytes, so no byte update necessary
-            scriptingBlock1.script[54].scriptData = FFL2R_utils.Utility.leonsText(leonsMagi)
+            scriptingBlock1.replaceScript(54, FFL2R_utils.GamePrep.leonsText(leonsMagi))
         if script[0] in (201, 202, 203): #race scripts
             raceMagi.append(magiList[0])
         magiList.pop(0)
@@ -203,7 +218,6 @@ def newStarters(monsterBlock:FFL2R_io.MonsterData, menuBlock:FFL2R_io.ScriptBloc
         monsterBlock.data[245+starterIndex].name = monsterBlock.data[starter].name
         monsterBlock.data[245+starterIndex].goldIndex = monsterBlock.data[starter].goldIndex
 
-
         if monsterBlock.data[starter].dslevel < 10:
             hexLevel = [0xFF, 0xFF, 0xB0 + monsterBlock.data[starter].dslevel]
         else:
@@ -225,5 +239,4 @@ if __name__ == "__main__":
     parser.add_argument('-g', '--gold_drops', type=int)
     args = parser.parse_args()
     main(rom_path = args.rom_path, seed=args.seed, encounterRate=args.encounter_rate, goldDrops=args.gold_drops)
-
 
