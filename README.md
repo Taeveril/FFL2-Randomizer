@@ -22,7 +22,7 @@
     - Mutant stat growth behaves as expected.
     - Dooring/Pegasus/Teleporting during the race will now force a dismount.
 
-##Version 0.8.1 (10/2/2025):
+## Version 0.8.1 (10/2/2025):
   - Char2's parents at the starting town will now give you a random item instead of just a cure potion.
   - More behind-the-scenes work that isn't player facing.
 
