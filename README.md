@@ -24,6 +24,7 @@
 
 ## Version 0.8.1 (10/2/2025):
   - Char2's parents at the starting town will now give you a random item instead of just a cure potion.
+  - The Memo command has been dummied out, freeing up a lot of space internally.
   - More behind-the-scenes work that isn't player facing.
 
 ## How to:
