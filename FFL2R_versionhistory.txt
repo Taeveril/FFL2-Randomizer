@@ -1,8 +1,11 @@
 Final Fantasy Legend 2 Randomizer Version History
 
+Version 0.8.2 (11/5/2025):
+	Most of the inner re-scripting has been completed. The next phase is world rando.
+	Dismounting from your dragon is now done in assembly code.
+
 Version 0.8.1 (10/2/2025):
-	Char2's parents at the starting town will now give you a random item instead of just a cure potion.
-	The Memo command has been dummied out, freeing up a lot of space internally.
+	Char2's parent at the starting town will now give you a random item instead of just a cure potion.
 	More behind-the-scenes work that isn't player facing.
 
 Version 0.8 (9/17/2025):
@@ -98,4 +101,3 @@ Version 0.1.1 (5/22/2025):
 Version 0.1.0 (5/21/2025):
 
     Initial commit
-

@@ -85,7 +85,15 @@ class ScriptBlock:
     def replaceScript(self, index:int, data:list):
         byteChange = len(data) - len(self.script[index].scriptData)
         self.script[index].scriptData = data
-        self.addBytes(index, byteChange)   
+        self.addBytes(index, byteChange)
+
+    def insertIntoScriptAtEnd(self, index:int, insertion:list):
+        oldLength = len(self.script[index].scriptData)
+        self.script[index].scriptData.pop()
+        self.script[index].scriptData = self.script[index].scriptData + insertion + [0x0]
+        newLength = len(self.script[index].scriptData)
+        change = newLength - oldLength
+        self.addBytes(index, change)
 
 class Script:
     def __init__(self, array:list, header:int, location:int, bank:int):
@@ -213,6 +221,9 @@ class MapData:
                         case 3:
                             if isinstance(npc, list) and k == varCheck[0]:
                                 print(f"{k} - {FFL2R_utils.Utility.listToHex(npc)}")
+                        case 4:
+                            if isinstance(npc, list) and npc[5] == varCheck[0]:
+                                npcList.append([k, v.npcs.index(npc), npc])
         return npcList
     
     def headerInfo(self, match:int):
@@ -232,24 +243,32 @@ class MapData:
     Is NPCs: {v.isNPCs}
     Trigger Count: {v.triggerCount}
     Triggers: {v.triggerRef}
-    NPCGFX: {[hex(x) for x in v.npcgfx]}
-    NPCs: {[[hex(y) for y in x] for x in v.npcs if type(x) == list]}"""
+    NPCGFX: {[[hex(x) for x in v.npcgfx] if v.npcgfx else "None"]}
+    NPCs: {[[[hex(y) for y in x] for x in v.npcs if type(x) == list] if v.npcs else "None"]}"""
                 )
 
     def addNPC(self, index:int, gfx: int, npc:list):
         totalShift = 6
+        if self.header[index].isNPCs:
+            self.header[index].npcs.pop()
+            self.header[index].npcs.append(npc)
+        else:
+            self.header[index].isNPCs = True
+            self.header[index].npcgfx = [0xFF]
+            self.header[index].npcs = [npc]
+            self.header[index].flagsAndTriggerTiles+=0x80
+            totalShift+=2
+        self.header[index].npcs.append(0xFF)
         if gfx != 0:
             self.header[index].npcgfx.pop()
             self.header[index].npcgfx.append(gfx)
             if len(self.header[index].npcgfx) < 6:
                 self.header[index].npcgfx.append(0xFF)
-                totalShift = 7
-        self.header[index].npcs.pop()
-        self.header[index].npcs.append(npc)
-        self.header[index].npcs.append(0xFF)
+                totalShift+=1
         for v in self.doors.values():
             if v.map > index:
                 v.addr+=totalShift
+                
 
     def delNPC(self, index:int, amount:list):
         self.header[index].npcs.pop()
@@ -259,6 +278,19 @@ class MapData:
         for v in self.doors.values():
             if v.map > index:
                 v.addr-=(amount*6)
+
+    def remNPC(self, index:int, target:int):
+        totalShift = 6
+        self.header[index].npcs.pop(target)
+        if self.header[index].npcs[0] == 0xff:
+            self.header[index].npcs = None
+            self.header[index].npcgfx = None
+            self.header[index].isNPCs = False
+            self.header[index].flagsAndTriggerTiles-=0x80
+            totalShift = 8
+        for v in self.doors.values():
+            if v.map > index:
+                v.addr-=totalShift
 
     def getDoors(self, rom:mmap)->dict:
         indexer = 0

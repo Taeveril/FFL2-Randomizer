@@ -42,6 +42,7 @@ def main(rom_path:str|None, seed:int|None, encounterRate:int|None, goldDrops:int
     FFL2R_bugfixes.AssemblyFixes.missingTrigger(romData)
     FFL2R_bugfixes.AssemblyFixes.magiFix(romData)
     FFL2R_bugfixes.AssemblyFixes.mutantStr(romData)
+    FFL2R_bugfixes.AssemblyFixes.forceRaceDismount(romData)
     FFL2R_bugfixes.AssemblyFixes.goldDropFix(romData)
 
     FFL2R_qol.AssemblyQOL.moveHax(romData)
@@ -62,18 +63,21 @@ def main(rom_path:str|None, seed:int|None, encounterRate:int|None, goldDrops:int
     memoBlock.headerData.addr = memoBlock.headerData.getAddr(romData)
     memoBlock.script = memoBlock.getData(romData)
 
-    FFL2R_bugfixes.ScriptedFixes.centralPillarUnlocks(scriptingBlock1, maps)
     FFL2R_bugfixes.ScriptedFixes.moveMrS(scriptingBlock1, maps)
     FFL2R_bugfixes.ScriptedFixes.fixTheRace(scriptingBlock1, scriptingBlock2, maps)
 
     FFL2R_utils.GamePrep.newTitleScreen(menuBlock, VERSION, gameSeed)
+    FFL2R_utils.GamePrep.magiCheckRedo(scriptingBlock1, scriptingBlock2, maps, treasureFlagReclaim)
     FFL2R_utils.GamePrep.newDropScripts(scriptingBlock1, scriptingBlock2)
     FFL2R_utils.GamePrep.kiShrineCleanup(scriptingBlock1, scriptingBlock2, maps)
     FFL2R_utils.GamePrep.memoRemove(scriptingBlock1, scriptingBlock2, menuBlock, memoBlock, romData)
+    FFL2R_utils.GamePrep.venusWorldCleanup(scriptingBlock1, scriptingBlock2, memoBlock, maps)
+    FFL2R_utils.GamePrep.dadDeathCutscenes(scriptingBlock1, scriptingBlock2, memoBlock)
+    FFL2R_utils.GamePrep.nastyChest(scriptingBlock1, maps)
 
     FFL2R_qol.ScriptedQOL.newNPCHelpers(scriptingBlock1, scriptingBlock2, maps)
 
-    magiShuffle(scriptingBlock1, scriptingBlock2, maps, FFL2R_data.GameData.magi)
+    magiShuffle(scriptingBlock1, scriptingBlock2, memoBlock, maps, FFL2R_data.GameData.magi)
     treasureShuffle(maps, scriptingBlock2, FFL2R_data.GameData.treasures, treasureFlagReclaim)
     shopRando(shops, FFL2R_data.GameData.shopTiers)
 
@@ -91,7 +95,7 @@ def main(rom_path:str|None, seed:int|None, encounterRate:int|None, goldDrops:int
     
     for k,v in FFL2R_data.GameData.newItemPrices.items():
          romData[k] = v
-
+    
     romData = FFL2R_io.File.editRom(romData, scriptingBlock1, scriptingBlock2, menuBlock, memoBlock, maps, shops, goldTable, 
                                     monsterTable)
 
@@ -137,7 +141,7 @@ def treasureShuffle(mapHeaders:FFL2R_io.MapData, scriptingBlock2:FFL2R_io.Script
     scriptingBlock2.script[19].scriptData[26] = FFL2R_data.GameData.itemList[startGift]
     scriptingBlock2.script[19].scriptData[41] = FFL2R_data.GameData.itemList[startGift]
 
-def magiShuffle(scriptingBlock1:FFL2R_io.ScriptBlock, scriptingBlock2:FFL2R_io.ScriptBlock, mapHeaders:FFL2R_io.MapData, magi:list):
+def magiShuffle(scriptingBlock1:FFL2R_io.ScriptBlock, scriptingBlock2:FFL2R_io.ScriptBlock, memoBlock:FFL2R_io.ScriptBlock, mapHeaders:FFL2R_io.MapData, magi:list):
     magiList = magi
     random.shuffle(magiList)
     magiChests = mapHeaders.findNPCs(2)
@@ -163,7 +167,12 @@ def magiShuffle(scriptingBlock1:FFL2R_io.ScriptBlock, scriptingBlock2:FFL2R_io.S
         magiList.pop(0)
         if script[0] == 204 and raceMagi: #slow dragon race script
             magiList.insert(0, raceMagi[0])
-            raceMagi.pop(0)  
+            raceMagi.pop(0)
+    scriptList = memoBlock.findScriptsByBytes([0x19, 0x0A])
+    for script in scriptList:
+        memoBlock.script[script[0]].scriptData[script[1]+2] = magiList[0]
+        magiList.pop(0)
+
 
 def shopRando(shops:FFL2R_io.ShopData, tiers:list):
     def mixTier(tierData:list)->list:

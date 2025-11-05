@@ -26,6 +26,11 @@ class AssemblyFixes:
     def mutantStr(rom:mmap):
         rom[0x3119c] = 0x08
 
+    #the warp call normally sets var29 to 0. this instead inserts var31, which forces a dismount when warping, fixing the race bug
+    def forceRaceDismount(rom:mmap):
+        rom[0x5cb3] = 0x1f
+       
+
     #fixes gold drops when there is mutliple groups of enemies, written by tehtmi
     def goldDropFix(rom:mmap):
         asmmove = {
@@ -49,40 +54,6 @@ class ScriptedFixes:
     def __init__(self):
         pass
 
-    def centralPillarUnlocks(scriptingBlock1:FFL2R_io.ScriptBlock, mapHeaders:FFL2R_io.MapData):
-    # All MAGI checks are an invisible npc that otherwise halts the player if they fail to meet the requirement -- "We need more MAGI to open this door!"
-    # this can put the player in a rough state if the player Teleports/Pegasus/ItemDoor's to a world where they cannot escape, usually happens when 
-    # Apollo steals MAGI. This function makes it so that once the magi check passes, the NPC vanishes and does not respawn.
-    # Functionally, all these checks use script variable 16. The "opened" script increments the state, pulls the player through into the door,
-    # and then decrements the state. This edits the script to not decrement while putting a max state on these NPCs so they do not respawn.
-       scriptingBlock1.replaceScript(47, [0x12, 0x10, 0x10, 0x06, 0x36, 0x05, 0xC8, 0xE3, 0x8B, 0x8F, 0xF3, 0x0B, 0x0D, 0x19, 0xF0, 
-                                           0x01, 0xFF, 0x00])
-       doorLocks = {
-               23 : 0x01, #to giant world, map 23
-               39 : 0x02, #giant house, map 39 npc1
-               40 : 0x04, #to apollo world 40
-               47 : 0x03, #to Ki's head, wholly unnecessary but nice to be consistent map 47
-               56 : 0x05, #to guardian world map 56
-               84 : 0x06, #to ninja world map 84
-               100 : 0x07, #to venus world map 100
-               103 : 0x08, #to race world map 103
-               125 : 0x09, #to edo map 125
-               136 : 0x0A, #to nasty dungeon world map 136
-               161 : 0x0B, #to valhalla map 161
-               174 : 0x0C, #to central world map 174 npc14
-               175 : 0x0A  #map 175 back to valhalla. Maybe a bug since it checks for 66 Magi (to Edo) which is script 76, rather than 76 MAGI; but all irrelevant since it's meant to block you into final world.
-               }
-
-       for k,v in doorLocks.items():
-           match k:
-               case 39:
-                    npcTarget = 1
-               case 174:
-                    npcTarget = 14
-               case _:
-                    npcTarget = 0
-           mapHeaders.header[k].npcs[npcTarget][1] = v
-
     def moveMrS(scriptingBlock1:FFL2R_io.ScriptBlock, mapHeaders:FFL2R_io.MapData):
         #MrS blocks the first cave exit due to some poor scripting. Fixing the scripting lets us move MrS out of the way. 
         scriptingBlock1.insertIntoScript(19, 0, [0x15, 0x1, 0x1f, 0x19, 0x5, 0x16, 0xe])
@@ -104,8 +75,8 @@ class ScriptedFixes:
         scriptingBlock1.replaceScript(80, [0x15, 0x1f, 0x0, 0x19, 0x1, 0xdb, 0x0, 0x19, 0xf1, 0x30, 0xff, 0x19, 0x7, 0x3, 0xc0, 0xc8, 0xba, 0xc5, 0xf3, 0xf3, 
                                                  0x6, 0x99, 0x4e, 0xea, 0x56, 0x92, 0x68, 0x5f, 0x6, 0x20, 0x1f, 0x0, 0x77, 0xff, 0xcd, 0x75, 0xe0, 0xf3, 0xb, 0xd, 
                                                  0x19, 0xf0, 0x5, 0xbc, 0x65, 0xda, 0x82, 0xe7, 0xe8, 0xdf, 0x60, 0xdc, 0x65, 0xe6, 0xf3, 0xb, 0xd,  
-                                                 0x14, 0x12, 0x0, 0x14, 0x19, 0x6, 0x19, 0x6, 0x3a, 0x19, 0x7, 0xc, 0x0])
-        scriptingBlock1.replaceScript(95, [0x19, 0xf0, 0x5, 0x15, 0x1d, 0x2, 0x19, 0x0, 0x5d, 0x31, 0x14, 0xf, 0x3, 0x19, 0xf0, 0x10, 0x19, 0x7, 0x8b, 0x19, 
+                                                 0x14, 0x12, 0x0, 0x14, 0x19, 0x6, 0x19, 0x6, 0x3a, 0x19, 0x7, 0xc, 0x12, 0x10, 0x0])
+        scriptingBlock1.replaceScript(95, [0x15, 0x1e, 0x2, 0x19, 0x0, 0x5d, 0x31, 0x14, 0xf, 0x3, 0x19, 0xf0, 0x10, 0x19, 0x7, 0x8b, 0x19, 
                                                  0x7, 0xc, 0x0])
         scriptingBlock2.replaceScript(193, [0x4b, 0x55, 0xf3, 0x0])
         scriptingBlock2.replaceScript(201, [0x15, 0x1f, 0x0, 0x19, 0x1, 0xdb, 0x0, 0x15, 0x19, 0x2f, 0x19, 0x6, 0x37, 0x0, 0x15, 0x1f, 0x2f, 0x19, 0x6, 0x37, 
