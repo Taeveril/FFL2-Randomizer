@@ -22,10 +22,9 @@
     - Mutant stat growth behaves as expected.
     - Dooring/Pegasus/Teleporting during the race will now force a dismount.
 
-## Version 0.8.1 (10/2/2025):
-  - Char2's parents at the starting town will now give you a random item instead of just a cure potion.
-  - The Memo command has been dummied out, freeing up a lot of space internally.
-  - More behind-the-scenes work that isn't player facing.
+## Version 0.8.2 (11/5/2025):
+- Most of the inner re-scripting has been completed. The next phase is world rando.
+- Dismounting from your dragon is now done in assembly code.
 
 ## How to:
 - Download the Python scripts (and install Python if you don't have it).
