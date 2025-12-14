@@ -1,5 +1,11 @@
 Final Fantasy Legend 2 Randomizer Version History
 
+Version 0.9.0 (12/14/2025):
+	World Shuffle is in.
+		You still need 76 Magi to get access to Final World, still the right pillar in Valhalla.
+		Prism use will give inaccurate counts. Should be fixed by next update.
+		Teleport unlocks will be inconsistent. Should be fixed by next update.
+
 Version 0.8.2 (11/5/2025):
 	Most of the inner re-scripting has been completed. The next phase is world rando.
 	Dismounting from your dragon is now done in assembly code.
@@ -8,7 +14,7 @@ Version 0.8.1 (10/2/2025):
 	Char2's parent at the starting town will now give you a random item instead of just a cure potion.
 	More behind-the-scenes work that isn't player facing.
 
-Version 0.8 (9/17/2025):
+Version 0.8.0 (9/17/2025):
 	Added NPCs will now let you access things previously closed off:
 		After Ki leaves, an NPC next to the first world central pillar will let you revisit Ashura's Base.
 		An NPC will sell Echigoya's wares after he abandons his conuter.

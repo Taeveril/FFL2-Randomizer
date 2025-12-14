@@ -8,7 +8,7 @@ import argparse
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 
-VERSION = 0.8
+VERSION = 0.9
 
 def main(rom_path:str|None, seed:int|None, encounterRate:int|None, goldDrops:int|None):
     Tk().withdraw()
@@ -80,6 +80,7 @@ def main(rom_path:str|None, seed:int|None, encounterRate:int|None, goldDrops:int
     magiShuffle(scriptingBlock1, scriptingBlock2, memoBlock, maps, FFL2R_data.GameData.magi)
     treasureShuffle(maps, scriptingBlock2, FFL2R_data.GameData.treasures, treasureFlagReclaim)
     shopRando(shops, FFL2R_data.GameData.shopTiers)
+    worldShuffle(maps, FFL2R_data.GameData.pillarToWorld, FFL2R_data.GameData.worldToPillar)
 
     FFL2R_utils.GamePrep.convertToRealChests(scriptingBlock1, maps, treasureFlagReclaim)
 
@@ -95,6 +96,7 @@ def main(rom_path:str|None, seed:int|None, encounterRate:int|None, goldDrops:int
     
     for k,v in FFL2R_data.GameData.newItemPrices.items():
          romData[k] = v
+   
     
     romData = FFL2R_io.File.editRom(romData, scriptingBlock1, scriptingBlock2, menuBlock, memoBlock, maps, shops, goldTable, 
                                     monsterTable)
@@ -239,6 +241,28 @@ def newStarters(monsterBlock:FFL2R_io.MonsterData, menuBlock:FFL2R_io.ScriptBloc
             case 2:
                 pos = 97
         menuBlock.insertIntoScript(21, pos, hexLevel)
+
+def worldShuffle(mapHeaders:FFL2R_io.MapData, worldTo:list, worldFrom:list):
+    newWorldOrder = worldFrom
+    random.shuffle(newWorldOrder)
+    for pillar in worldTo:
+        script = False
+        if newWorldOrder[0][2] == 87:
+            trigger = [87, 0]
+            script = True
+        elif newWorldOrder[0][2] > 255:
+            trigger = [newWorldOrder[0][2] - 256, 6]
+        else:
+            trigger = [newWorldOrder[0][2], 5]
+        mapHeaders.header[pillar[0]].triggerRef[pillar[1]] = trigger
+        if pillar[2] > 255:
+            trigger = [pillar[2] - 256, 6]
+        else:
+            trigger = [pillar[2], 5]
+        mapHeaders.header[newWorldOrder[0][0]].triggerRef[newWorldOrder[0][1]] = trigger
+        if script == True:
+            mapHeaders.header[90].triggerRef[0] = trigger
+        newWorldOrder.pop(0)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

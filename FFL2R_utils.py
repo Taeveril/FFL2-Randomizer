@@ -93,7 +93,7 @@ class GamePrep:
                    memoBlock:FFL2R_io.ScriptBlock, romData:mmap):
         def clearMemoSetCalls(block:FFL2R_io.ScriptBlock):
             c1 = block.findScriptsByBytes([0x18])
-            c2 = [x for x in c1 if block.script[x[0]].scriptData[x[1]-1] not in range(0x12, 0x1b)]
+            c2 = [x for x in c1 if block.script[x[0]].scriptData[x[1]-1] not in range(0x01, 0x1b)]
             c2.reverse()
             for x in c2:
                 block.removeFromScript(x[0], x[1], x[1]+2)
