@@ -5,6 +5,7 @@
 - Magi shuffle.
 - Shop shuffle.
 - Starting monsters randomized.
+- World shuffle.
 - QoL Features:
   - Empty chests will appear open.
   - Encounter rate adjustment.
@@ -22,9 +23,11 @@
     - Mutant stat growth behaves as expected.
     - Dooring/Pegasus/Teleporting during the race will now force a dismount.
 
-## Version 0.8.2 (11/5/2025):
-- Most of the inner re-scripting has been completed. The next phase is world rando.
-- Dismounting from your dragon is now done in assembly code.
+## Version 0.9.0 (12/14/2025):
+- World Shuffle is in.
+		- You still need 76 Magi to get access to Final World, still the right pillar in Valhalla.
+		- Prism use will give inaccurate counts. Should be fixed by next update.
+		- Teleport unlocks will be inconsistent. Should be fixed by next update.
 
 ## How to:
 - Download the Python scripts (and install Python if you don't have it).
