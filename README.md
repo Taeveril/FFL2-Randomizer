@@ -25,9 +25,9 @@
 
 ## Version 0.9.0 (12/14/2025):
 - World Shuffle is in.
-		- You still need 76 Magi to get access to Final World, still the right pillar in Valhalla.
-		- Prism use will give inaccurate counts. Should be fixed by next update.
-		- Teleport unlocks will be inconsistent. Should be fixed by next update.
+	- You still need 76 Magi to get access to Final World, still the right pillar in Valhalla.
+	- Prism use will give inaccurate counts. Should be fixed by next update.
+	- Teleport unlocks will be inconsistent. Should be fixed by next update.
 
 ## How to:
 - Download the Python scripts (and install Python if you don't have it).
