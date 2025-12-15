@@ -36,9 +36,6 @@
   - will also take command line arguments -s for seed, -r for rom path, and -e for encounter rate.
 - Will generate a ROM.
 
-## Plans:
-- World randomizer.
-
 ## Credits and thank yous:
 This project really stands on the shoulders of giants. Over two decades of people poking and
 mapping the ROM have made this possible.
