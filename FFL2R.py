@@ -5,6 +5,7 @@ import FFL2R_io
 import FFL2R_bugfixes
 import FFL2R_qol
 import argparse
+import mmap
 from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 
@@ -80,7 +81,7 @@ def main(rom_path:str|None, seed:int|None, encounterRate:int|None, goldDrops:int
     magiShuffle(scriptingBlock1, scriptingBlock2, memoBlock, maps, FFL2R_data.GameData.magi)
     treasureShuffle(maps, scriptingBlock2, FFL2R_data.GameData.treasures, treasureFlagReclaim)
     shopRando(shops, FFL2R_data.GameData.shopTiers)
-    worldShuffle(maps, FFL2R_data.GameData.pillarToWorld, FFL2R_data.GameData.worldToPillar)
+    worldShuffle(romData, maps, scriptingBlock1, scriptingBlock2, FFL2R_data.GameData.pillarsWorlds)
 
     FFL2R_utils.GamePrep.convertToRealChests(scriptingBlock1, maps, treasureFlagReclaim)
 
@@ -96,7 +97,6 @@ def main(rom_path:str|None, seed:int|None, encounterRate:int|None, goldDrops:int
     
     for k,v in FFL2R_data.GameData.newItemPrices.items():
          romData[k] = v
-   
     
     romData = FFL2R_io.File.editRom(romData, scriptingBlock1, scriptingBlock2, menuBlock, memoBlock, maps, shops, goldTable, 
                                     monsterTable)
@@ -242,27 +242,80 @@ def newStarters(monsterBlock:FFL2R_io.MonsterData, menuBlock:FFL2R_io.ScriptBloc
                 pos = 97
         menuBlock.insertIntoScript(21, pos, hexLevel)
 
-def worldShuffle(mapHeaders:FFL2R_io.MapData, worldTo:list, worldFrom:list):
-    newWorldOrder = worldFrom
+def worldShuffle(romData:mmap, mapHeaders:FFL2R_io.MapData, scriptingBlock1:FFL2R_io.ScriptBlock, scriptingBlock2:FFL2R_io.ScriptBlock, pillarsWorlds:dict):
+    warpScripts = {}
+    warpNames = {}
+    newWorldOrder = list(pillarsWorlds.values())
+    for world in newWorldOrder:
+        if world[3]:
+            for s in world[3]:
+                warpScripts[s] = scriptingBlock1.script[s].scriptData
+        if world[4]:
+            for loc in world[4]:
+                name = []
+                for x in range(0, 16):
+                   name.append(romData[loc+x])
+                warpNames[loc] = name
     random.shuffle(newWorldOrder)
-    for pillar in worldTo:
-        script = False
-        if newWorldOrder[0][2] == 87:
-            trigger = [87, 0]
-            script = True
-        elif newWorldOrder[0][2] > 255:
-            trigger = [newWorldOrder[0][2] - 256, 6]
+    scriptIndex = 0
+    prismArray = []
+    prismLoc = 0x3e600
+    teleCounter = 3
+    j = 0x3f6f0
+    for k in pillarsWorlds.keys():
+        gWorld = False
+        if newWorldOrder[0][0] == 87:
+            gWorld = True
+            trigger = [87,0]
+        elif newWorldOrder[0][0] > 255:
+            trigger = [newWorldOrder[0][0]-256, 6]
         else:
-            trigger = [newWorldOrder[0][2], 5]
-        mapHeaders.header[pillar[0]].triggerRef[pillar[1]] = trigger
-        if pillar[2] > 255:
-            trigger = [pillar[2] - 256, 6]
+            trigger = [newWorldOrder[0][0], 5]
+        mapHeaders.header[k[0]].triggerRef[k[1]] = trigger
+        mapHeaders.header[k[0]].triggerRef[k[3]] = [newWorldOrder[0][6],0]
+        if k[2] > 255:
+            trigger = [k[2] - 256, 6]
         else:
-            trigger = [pillar[2], 5]
-        mapHeaders.header[newWorldOrder[0][0]].triggerRef[newWorldOrder[0][1]] = trigger
-        if script == True:
+            trigger = [k[2], 5]
+        mapHeaders.header[newWorldOrder[0][1]].triggerRef[newWorldOrder[0][2]] = trigger
+        if gWorld == True:
             mapHeaders.header[90].triggerRef[0] = trigger
+        if newWorldOrder[0][3]:
+            for s in newWorldOrder[0][3]:
+                scriptingBlock1.replaceScript(99+scriptIndex, warpScripts[s])
+                scriptIndex+=1
+        if newWorldOrder[0][4]:
+            for loc in newWorldOrder[0][4]:
+                for x in range(0,16):
+                    romData[j] = warpNames[loc][x]
+                    j+=1
+        if newWorldOrder[0][5]:
+            if newWorldOrder[0][5][0] == 1:
+                scriptingBlock2.script[newWorldOrder[0][5][1]].scriptData[newWorldOrder[0][5][2]+2] = teleCounter
+            else:
+                scriptingBlock1.script[newWorldOrder[0][5][1]].scriptData[newWorldOrder[0][5][2]+2] = teleCounter
+            teleCounter+=1
+        prismArray.append(newWorldOrder[0][7])
         newWorldOrder.pop(0)
+    for x in range(0,14):
+        match x:
+            case 0:
+                romData[prismLoc] = 7
+            case 2:
+                romData[prismLoc + 2] = romData[prismLoc + 1] + 1
+            case 4:
+                romData[prismLoc + 4] = romData[prismLoc + 3] + 7
+            case 8:
+                romData[prismLoc + 8] = romData[prismLoc + 7] + 1
+            case _:
+                romData[prismLoc + x] = romData[prismLoc + x - 1] + prismArray[0]
+                prismArray.pop(0)
+
+
+
+
+
+            
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
