@@ -23,11 +23,13 @@
     - Mutant stat growth behaves as expected.
     - Dooring/Pegasus/Teleporting during the race will now force a dismount.
 
-## Version 0.9.0 (12/14/2025):
-- World Shuffle is in.
-	- You still need 76 Magi to get access to Final World, still the right pillar in Valhalla.
-	- Prism use will give inaccurate counts. Should be fixed by next update.
-	- Teleport unlocks will be inconsistent. Should be fixed by next update.
+## Version 0.9.1 (12/22/2025):
+- Teleport unlocks have been fixed.
+- Fixed a bug where a world shuffle could cause Apollo not to appear in his world.
+- Fixed an issue where new scripts with yes/no prompts would require a button press to advance rather than automate.
+- Added Guardians to Valhalla that will teleport you to the other pillar once Odin is defeated.
+- Prism magi count is a lot harder to fix. Turns out that magi checks a number against your total magi count to give the appearance of telling you how many magi are left in the world.
+  - Its fixable, but remains as a known bug for now as Prism usage is not mandatory to complete the game.
 
 ## How to:
 - Download the Python scripts (and install Python if you don't have it).
