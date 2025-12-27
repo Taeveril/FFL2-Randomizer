@@ -23,13 +23,11 @@
     - Mutant stat growth behaves as expected.
     - Dooring/Pegasus/Teleporting during the race will now force a dismount.
 
-## Version 0.9.1 (12/22/2025):
-- Teleport unlocks have been fixed.
-- Fixed a bug where a world shuffle could cause Apollo not to appear in his world.
-- Fixed an issue where new scripts with yes/no prompts would require a button press to advance rather than automate.
-- Added Guardians to Valhalla that will teleport you to the other pillar once Odin is defeated.
-- Prism magi count is a lot harder to fix. Turns out that magi checks a number against your total magi count to give the appearance of telling you how many magi are left in the world.
-  - Its fixable, but remains as a known bug for now as Prism usage is not mandatory to complete the game.
+## Version 1.0.0 (12/22/2025):
+- Credits updated.
+- Fixed a bug where certain teleport unlocks would not increment correctly.
+- Fixed an issue where teleporting back to ninja world after dad's death required input before being able to move.
+- Fixed a rare issue Giant Town special shop would sometimes generate duplicate items.
 
 ## How to:
 - Download the Python scripts (and install Python if you don't have it).
