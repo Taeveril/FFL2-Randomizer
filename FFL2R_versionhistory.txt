@@ -1,5 +1,11 @@
 Final Fantasy Legend 2 Randomizer Version History
 
+Version 1.0.0 (12/27/2025):
+	Credits updated.
+	Fixed a bug where certain teleport unlocks would not increment correctly.
+	Fixed an issue where teleporting back to ninja world after dad's death required input before being able to move.
+	Fixed a rare issue Giant Town special shop would sometimes generate duplicate items.
+
 Version 0.9.1 (12/22/2025):
 	Teleport unlocks have been fixed.
 	Fixed a bug where a world shuffle could cause Apollo not to appear in his world.
