@@ -6,10 +6,10 @@ import FFL2R_bugfixes
 import FFL2R_qol
 import argparse
 import mmap
-from tkinter import Tk
+from tkinter import Menu, Tk
 from tkinter.filedialog import askopenfilename
 
-VERSION = 0.9
+VERSION = 1.0
 
 def main(rom_path:str|None, seed:int|None, encounterRate:int|None, goldDrops:int|None):
     Tk().withdraw()
@@ -74,7 +74,9 @@ def main(rom_path:str|None, seed:int|None, encounterRate:int|None, goldDrops:int
     FFL2R_utils.GamePrep.memoRemove(scriptingBlock1, scriptingBlock2, menuBlock, memoBlock, romData)
     FFL2R_utils.GamePrep.venusWorldCleanup(scriptingBlock1, scriptingBlock2, memoBlock, maps)
     FFL2R_utils.GamePrep.dadDeathCutscenes(scriptingBlock1, scriptingBlock2, memoBlock)
-    FFL2R_utils.GamePrep.nastyChest(scriptingBlock1, maps)
+    FFL2R_utils.GamePrep.nastyChest(scriptingBlock1, maps) 
+    FFL2R_utils.GamePrep.prismDummy(menuBlock)
+    FFL2R_utils.GamePrep.newCredits(memoBlock)
 
     FFL2R_qol.ScriptedQOL.newNPCHelpers(scriptingBlock1, scriptingBlock2, maps)
 
@@ -97,7 +99,7 @@ def main(rom_path:str|None, seed:int|None, encounterRate:int|None, goldDrops:int
     
     for k,v in FFL2R_data.GameData.newItemPrices.items():
          romData[k] = v
-    
+
     romData = FFL2R_io.File.editRom(romData, scriptingBlock1, scriptingBlock2, menuBlock, memoBlock, maps, shops, goldTable, 
                                     monsterTable)
 
@@ -175,7 +177,6 @@ def magiShuffle(scriptingBlock1:FFL2R_io.ScriptBlock, scriptingBlock2:FFL2R_io.S
         memoBlock.script[script[0]].scriptData[script[1]+2] = magiList[0]
         magiList.pop(0)
 
-
 def shopRando(shops:FFL2R_io.ShopData, tiers:list):
     def mixTier(tierData:list)->list:
         random.shuffle(tierData)
@@ -207,7 +208,7 @@ def shopRando(shops:FFL2R_io.ShopData, tiers:list):
                 items = mixTier(tiers[0])
                 bonusItems = mixTier(tiers[6]+tiers[7])
                 items = items + bonusItems
-                currentShop = populateShop(currentShop, length, items, bonusItems)
+                currentShop = populateShop(currentShop, length, items)
             case _: #most other shops
                 items = mixTier(tiers[v.tier])
                 bonusItems = mixTier(tiers[v.tier+1])
@@ -260,7 +261,7 @@ def worldShuffle(romData:mmap, mapHeaders:FFL2R_io.MapData, scriptingBlock1:FFL2
     scriptIndex = 0
     prismArray = []
     prismLoc = 0x3e600
-    teleCounter = 3
+    teleCounter = 2
     j = 0x3f6f0
     for k in pillarsWorlds.keys():
         gWorld = False
@@ -290,26 +291,26 @@ def worldShuffle(romData:mmap, mapHeaders:FFL2R_io.MapData, scriptingBlock1:FFL2
                     romData[j] = warpNames[loc][x]
                     j+=1
         if newWorldOrder[0][5]:
+            teleCounter+=newWorldOrder[0][5][3]
             if newWorldOrder[0][5][0] == 1:
                 scriptingBlock2.script[newWorldOrder[0][5][1]].scriptData[newWorldOrder[0][5][2]+2] = teleCounter
             else:
                 scriptingBlock1.script[newWorldOrder[0][5][1]].scriptData[newWorldOrder[0][5][2]+2] = teleCounter
-            teleCounter+=1
         prismArray.append(newWorldOrder[0][7])
         newWorldOrder.pop(0)
-    for x in range(0,14):
-        match x:
-            case 0:
-                romData[prismLoc] = 7
-            case 2:
-                romData[prismLoc + 2] = romData[prismLoc + 1] + 1
-            case 4:
-                romData[prismLoc + 4] = romData[prismLoc + 3] + 7
-            case 8:
-                romData[prismLoc + 8] = romData[prismLoc + 7] + 1
-            case _:
-                romData[prismLoc + x] = romData[prismLoc + x - 1] + prismArray[0]
-                prismArray.pop(0)
+    # for x in range(0,14):
+    #     match x:
+    #         case 0:
+    #             romData[prismLoc] = 7
+    #         case 2:
+    #             romData[prismLoc + 2] = romData[prismLoc + 1] + 1
+    #         case 4:
+    #             romData[prismLoc + 4] = romData[prismLoc + 3] + 7
+    #         case 8:
+    #             romData[prismLoc + 8] = romData[prismLoc + 7] + 1
+    #         case _:
+    #             romData[prismLoc + x] = romData[prismLoc + x - 1] + prismArray[0]
+    #             prismArray.pop(0)
 
 
 
