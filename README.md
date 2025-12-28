@@ -23,7 +23,7 @@
     - Mutant stat growth behaves as expected.
     - Dooring/Pegasus/Teleporting during the race will now force a dismount.
 
-## Version 1.0.0 (12/22/2025):
+## Version 1.0.0 (12/27/2025):
 - Credits updated.
 - Fixed a bug where certain teleport unlocks would not increment correctly.
 - Fixed an issue where teleporting back to ninja world after dad's death required input before being able to move.
