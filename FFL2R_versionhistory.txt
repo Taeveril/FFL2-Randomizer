@@ -1,5 +1,13 @@
 Final Fantasy Legend 2 Randomizer Version History
 
+Version 2.0.0 (1/11/2026):
+	Rewrote entire codebase again, trying to adopt pythonic principles...sort of.
+	Redid Final Shop logic. The NPC will now appear after world completion.
+	Lowered the price of Selfix from 50,000 to 25,000
+	Fixed a bug where the Key in Venus' world was not required to open doors.
+	Fixed a bug where the teleport unlock for Ashura's World would set to an incorrect value.
+	Fixed a bug where uring teleport would remove the guest character.
+
 Version 1.0.0 (12/27/2025):
 	Credits updated.
 	Fixed a bug where certain teleport unlocks would not increment correctly.
@@ -14,7 +22,6 @@ Version 0.9.1 (12/22/2025):
 	Prism magi count is a lot harder to fix. Turns out that magi checks a number against your total magi count to give the appearance of telling you how many magi are left in the world.
 		Its fixable, but remains as a known bug for now as Prism usage is not mandatory to complete the game.
 	
-
 Version 0.9.0 (12/14/2025):
 	World Shuffle is in.
 		You still need 76 Magi to get access to Final World, still the right pillar in Valhalla.
@@ -68,7 +75,6 @@ Version 0.5.1 (6/23/2025):
 	Movement speed is doubled.
 
 Version 0.5.0 (6/21/2025):
-
     Gold rate adjustment introduced. Will prompt for a number between 50-500 and will turn into a percentage to adjust.
         Gold drops will currently cap at 65535. 10% bonus for all monsters defeated still there.
         Have not yet fixed the meat/gold drop bug. Learning assembly (and translating it to hex) as fast as I can to try and get this fixed.
