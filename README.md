@@ -23,11 +23,13 @@
     - Mutant stat growth behaves as expected.
     - Dooring/Pegasus/Teleporting during the race will now force a dismount.
 
-## Version 1.0.0 (12/27/2025):
-- Credits updated.
-- Fixed a bug where certain teleport unlocks would not increment correctly.
-- Fixed an issue where teleporting back to ninja world after dad's death required input before being able to move.
-- Fixed a rare issue Giant Town special shop would sometimes generate duplicate items.
+## Version 2.0.0 (1/11/2026):
+- Rewrote entire codebase again, trying to adopt pythonic principles...sort of.
+- Redid Final Shop logic. The NPC will now appear after world completion.
+- Lowered the price of Selfix from 50,000 to 25,000
+- Fixed a bug where the Key in Venus' world was not required to open doors.
+- Fixed a bug where the teleport unlock for Ashura's World would set to an incorrect value.
+- Fixed a bug where uring teleport would remove the guest character.
 
 ## How to:
 - Download the Python scripts (and install Python if you don't have it).
