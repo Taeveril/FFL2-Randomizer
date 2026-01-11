@@ -8,7 +8,7 @@ and often times players might not be aware of the changes. The purpose of this t
 - Memo menu removed. Memo calls that prompt dialogue have remained, but most instances of memo-flag setting have been removed from scripting,
   freeing up a not-insignificant number of bytes.
   
-- Advancing to the next world calls on magi-count-checks to grant access. This has changed to be event-based instead, save for the pillar to
+- Advancing to the next world used to use magi-count-checks calls to grant access. This has changed to be event-based instead, save for the pillar to
   Final World.
   
 - Ki's shrine only has four NPCs + Ki. This is due to a maximum of six unique NPC sprites on a map, one of which got repurposed to a guardian 
@@ -43,9 +43,6 @@ and often times players might not be aware of the changes. The purpose of this t
 - Giant's World var usage has been extended to include Dad (some reason uses Ashura's world var) and all the way through Ki's body.
   
 - Ki's body now reuses some Final World variables, but resets them to 0 upon completion.
-
-- Many uses of magi-count-checks have been removed and replace with various var-state checks. The major one that remains is gathering all 76
-  magi to be able to head to Final World.
 
 - Apollo's world has been rescripted to be more randomizer friendly. To be able to move onto the next world, you must defeat Dunatis and exit
   through the Cave of Light.
