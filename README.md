@@ -29,7 +29,7 @@
 - Lowered the price of Selfix from 50,000 to 25,000
 - Fixed a bug where the Key in Venus' world was not required to open doors.
 - Fixed a bug where the teleport unlock for Ashura's World would set to an incorrect value.
-- Fixed a bug where uring teleport would remove the guest character.
+- Fixed a bug where using teleport would remove the guest character.
 
 ## How to:
 - Download the Python scripts (and install Python if you don't have it).
