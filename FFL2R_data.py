@@ -1,5 +1,5 @@
 ﻿class GameData:
-    treasures = [
+    TREASURES = [
         0x1D,
         0x17,
         0x00,
@@ -45,7 +45,7 @@
         0x6E,
         0x73,
         0x41,
-        0x0A,
+        0x0a,
         0x45,
         0x5F,
         0x2D,
@@ -59,10 +59,10 @@
         0x6F,
         0x5E,
         0x40,
-        0x0D,
+        0x0d,
         0x2E,
         0x34,
-        0x0E,
+        0x0e,
         0x30,
         0x54,
         0x09,
@@ -89,7 +89,7 @@
         0x5E,
         0x60,
         0x2E,
-        0x0D,
+        0x0d,
         0x23,
         0x7E,
         0x6A,
@@ -107,7 +107,7 @@
         0x6B
         ]
     
-    magi = [
+    MAGI = [
         # 76 total. TrueEye (OA) is not a real Magi but instead a plot event that flips a script variable to make the Light Cave visible.
         # It is not included in this list and not shuffled.
         0x00, # Power, 9
@@ -183,51 +183,21 @@
         0x07,
         0x08, # Masmune, 1
         0x09, # Aegis, 1
-        0x0B, # Heart, 1
-        0x0C, # Pegasus, 1
-        0x0D # Prism, 1 
+        0x0b, # Heart, 1
+        0x0c, # Pegasus, 1
+        0x0d # Prism, 1 
         ]
 
     newItemPrices = {
         #prices are stored in three hex, addresses read right to left.
-        0x3f929 : 0xC4,  #stat boosting potions, changed to 2.5k each up from 1k
-        0x3f92a : 0x09,
-        0x3f92b : 0x00,
-        0x3f92c : 0xC4,
-        0x3f92d : 0x09,
-        0x3f92e : 0x00,
-        0x3f92f : 0xC4,
-        0x3f930 : 0x09,
-        0x3f931 : 0x00,
-        0x3f932 : 0xC4,
-        0x3f933 : 0x09,
-        0x3f934 : 0x00,
-        0x3f896 : 0x50, #vampic, changed to 50,000
-        0x3f897 : 0xC3,
-        0x3f898 : 0x00,
-        0x3f9da : 0x50, #selfix, changed to 50,000
-        0x3f9db : 0xC3,
-        0x3f9dc : 0x00,
-        0x3f9dd : 0xD1, #seven sword, changed to 77,777
-        0x3f9de : 0x2F,
-        0x3f9df : 0x01
+        67 : 2500,  #stat boosting potions, changed to 2.5k each up from 1k
+        68 : 2500,
+        69 : 2500,
+        70 : 2500,
+        18 : 50000, #vampic, changed to 50,000
+        126 : 25000, #selfix, changed to 25,000,
+        127 : 77777, #seven sword, changed to 77,777
         }
-
-    pillarsWorlds = {
-        #pillar world, map index in door, out door, map index trigger set prism
-        #in door, world, map index out door, teleport scripts, name addr, teleport unlock script location, prism count
-        (23, 6, 98, 5)     : [99, 22, 0, [99,100], [0x3f6f0, 0x3f700], [1, 74, 134, 2], 147, 7],
-        (40, 6, 104, 5)    : [105, 39, 3, [101], [0x3f710], [1, 83, 502, 1], 148, 3],
-        (56, 6, 193, 5)    : [194, 55, 1, [102, 103], [0x3f720, 0x3f730], [1, 236, 339, 2], 149, 10],
-        (84, 6, 230, 5)    : [87, 83, 0, [104], [0x3f740], [0, 10, 41, 1], 150, 4], #87 is of type script
-        (100, 9, 235, 8)   : [237, 99, 1, None, None, None, 151, 2],
-        (103, 6, 280, 5)   : [281, 210, 2, [105], [0x3f750], [1, 156, 105, 1], 152, 11],
-        (125, 6, 286, 5)   : [287, 124, 0, [106], [0x3f760], [0, 78, 77, 1], 153, 4],
-        (136, 6, 315, 5)   : [316, 135, 0, [107], [0x3f770], [0, 117, 273, 1], 154, 4],
-        (161, 6, 134, 5)   : [387, 160, 0, [108], [0x3f780], [0, 94, 12, 1], 155, 1],
-        (163, 5, 391, 4)   : [390, 162, 1, [109], [0x3f790], [0, 132, 25, 1], 156, 8]
-        }
-
 
     #tier 1 x 3 = 24 slots, 14 items
     #tier 2 x 3 = 24 slots, 16 items
@@ -242,11 +212,11 @@
     shopTiers = [
         [0x47, 0x24, 0x2F, 0x43, 0x44, 0x45, 0x46], #tent, cureb, healstaff, powerp, speedp, magicp, bodyp
         [0x35, 0x31, 0x3A, 0x17, 0x00, 0x01, 0x15, 0x48, 0x4F, 0x6D, 0x2A, 0x4C, 0x56, 0x67], #bronze, hammer, longs, bow, whip, punch, psi knife, sleepb, colt, stung, coin
-        [0x18, 0x32, 0x36, 0x3B, 0x68, 0x02, 0x03, 0x21, 0x0F, 0x50, 0x26, 0x27, 0x28, 0x29, 0x4D, 0x71], #silver, kimono, axe, battles, abacus, rapier, kick, fireb, iceb, thunderb, fogb, musket, rocket]
+        [0x18, 0x32, 0x36, 0x3B, 0x68, 0x02, 0x03, 0x21, 0x0f, 0x50, 0x26, 0x27, 0x28, 0x29, 0x4D, 0x71], #silver, kimono, axe, battles, abacus, rapier, kick, fireb, iceb, thunderb, fogb, musket, rocket]
         [0x19, 0x37, 0x3C, 0x64, 0x33, 0x04, 0x05, 0x55, 0x49, 0x16, 0x51, 0x25, 0x2B, 0x5A, 0x5F, 0x60], #gold, armybody, katana, golds, temptat, blitzw, goldbow, headbutt, prayerb, stoneb, smg, fireg, missle]
-        [0x62, 0x3D, 0x63, 0x65, 0x0C, 0x0A, 0x0B, 0x07, 0x06, 0x10, 0x4B, 0x6E, 0x5B, 0x5C, 0x4A], #giant, armyhelm, geta, thunderaxe, flames, ices, ogreaxe, corals, sabre, counter, psis, grenade, bazooka, chainsaw
-        [0x38, 0x3F, 0x73, 0x1A, 0x1B, 0x0E, 0x66, 0x08, 0x14, 0x6C, 0x52, 0x2C, 0x2D, 0x4E, 0x5D], #dragonbody, hermes, gianthelm, flameshield, iceshield, runeaxe, sypha, dragons, revenge, lasers, x-kick, deathb, magestaff, magnum, vulcan
-        [0x75, 0x40, 0x3E, 0x34, 0x1C, 0x69, 0x0D, 0x6A, 0x09, 0x11, 0x53, 0x2E, 0x30, 0x6F, 0x5E], #battlebody, hecate, ninjahand, dragonshield, samuraishield, defends, muramas, suns, catclaw, jyudo, wizardstaff, flareb, laserg, tankc
+        [0x62, 0x3D, 0x63, 0x65, 0x0c, 0x0a, 0x0b, 0x07, 0x06, 0x10, 0x4B, 0x6E, 0x5B, 0x5C, 0x4A], #giant, armyhelm, geta, thunderaxe, flames, ices, ogreaxe, corals, sabre, counter, psis, grenade, bazooka, chainsaw
+        [0x38, 0x3F, 0x73, 0x1A, 0x1B, 0x0e, 0x66, 0x08, 0x14, 0x6C, 0x52, 0x2C, 0x2D, 0x4E, 0x5D], #dragonbody, hermes, gianthelm, flameshield, iceshield, runeaxe, sypha, dragons, revenge, lasers, x-kick, deathb, magestaff, magnum, vulcan
+        [0x75, 0x40, 0x3E, 0x34, 0x1C, 0x69, 0x0d, 0x6A, 0x09, 0x11, 0x53, 0x2E, 0x30, 0x6F, 0x5E], #battlebody, hecate, ninjahand, dragonshield, samuraishield, defends, muramas, suns, catclaw, jyudo, wizardstaff, flareb, laserg, tankc
         [0x39, 0x76, 0x7E, 0x7F, 0x6B, 0x22, 0x13, 0x23, 0x54, 0x72, 0x12, 0x61, 0x74], #arthur, parasuit, selffix, sevens, gungnir, xcalibr, glass, samuraibow, karate, psig, vampic, nukebomb, hyper
         [0x1D, 0x1E, 0x1F, 0x20, 0x41, 0x42, 0x70, 0x77] #cure, xcure, curse, eyedrop, elixier, soft, speedup, door
         ]
@@ -430,128 +400,128 @@
             0xFF:" "
         }
 
-    itemList = (
-        0x00, #Hammer
-        0x01, #Long Sword
-        0x02, #Axe
-        0x03, #Battle Sword
-        0x04, #Katana
-        0x05, #Gold Sword
-        0x06, #Coral Sword
-        0x07, #Ogre Axe
-        0x08, #Dragon Sword
-        0x09, #Sun Sword
-        0x0A, #Flame Sword
-        0x0B, #Ice Sword
-        0x0C, #Thunder Axe
-        0x0D, #Defend Sword
-        0x0E, #Rune Axe
-        0x0F, #Rapier
-        0x10, #Sabre
-        0x11, #Cat Claw
-        0x12, #Vampric Sword
-        0x13, #Glass Sword
-        0x14, #Revenge Sword
-        0x15, #Bow
-        0x16, #Gold Bow
-        0x17, #Bronze Shield
-        0x18, #Silver Shield
-        0x19, #Gold Shield
-        0x1A, #Flame Shield
-        0x1B, #Ice Shield
-        0x1C, #Dragon Shield
-        0x1D, #Cure Potion
-        0x1E, #X-Cure Potion
-        0x1F, #Curse Potion
-        0x20, #Eye Drop
-        0x21, #Abacus
-        0x22, #Excalibur
-        0x23, #Samurai Bow
-        0x24, #Cure Book
-        0x25, #Prayer Book
-        0x26, #Fire Book
-        0x27, #Ice Book
-        0x28, #Thunder Book
-        0x29, #Fog Book
-        0x2A, #Sleep Book
-        0x2B, #Stone Book
-        0x2C, #Death Book
-        0x2D, #Mage Staff
-        0x2E, #Wizard Staff
-        0x2F, #Heal Staff
-        0x30, #Flare Book
-        0x31, #Bronze Helm
-        0x32, #Silver Helm
-        0x33, #Gold Helm
-        0x34, #Dragon Helm
-        0x35, #Bronze Armor
-        0x36, #Silver Armor
-        0x37, #Gold Armor
-        0x38, #Dragon Armor
-        0x39, #Arthur Armor
-        0x3A, #Bronze Gauntlets
-        0x3B, #Silver Gauntlets
-        0x3C, #Gold Gauntlets
-        0x3D, #Giant Gauntlets
-        0x3E, #Ninja Gauntlets
-        0x3F, #Hermes Shoes
-        0x40, #Hecate Shoes
-        0x41, #Elixir
-        0x42, #Soft Potion
-        0x43, #Power Potion
-        0x44, #Speed Potion
-        0x45, #Magic Potion
-        0x46, #Body Potion
-        0x47, #Tent
-        0x48, #Whip
-        0x49, #Blitz Whip
-        0x4A, #Chainsaw
-        0x4B, #Counter
-        0x4C, #Colt
-        0x4D, #Musket
-        0x4E, #Magnum
-        0x4F, #Punch
-        0x50, #Kick
-        0x51, #Headbutt
-        0x52, #X-Kick
-        0x53, #Jyudo
-        0x54, #Karate
-        0x55, #Temptat
-        0x56, #Stun Gun
-        0x57, #Heat
-        0x5A, #SMG
-        0x5B, #Grenade
-        0x5C, #Bazooka
-        0x5D, #Vulcan Cannon
-        0x5E, #Tank Cannon
-        0x5F, #Fire Gun
-        0x60, #Missile
-        0x61, #NukeBomb
-        0x62, #Giant Armor
-        0x63, #Army Helm
-        0x64, #Army Armor
-        0x65, #Geta Shoes
-        0x66, #Sypha
-        0x67, #Coin
-        0x68, #Kimono
-        0x69, #Samurai Shield
-        0x6A, #Muramasa
-        0x6B, #Gungnir
-        0x6C, #Laser Sword
-        0x6D, #Psi Knife
-        0x6E, #Psi Sword
-        0x6F, #Laser Gun
-        0x70, #Speed Up
-        0x71, #Rocket
-        0x72, #Psi Gun
-        0x73, #Giant Helm
-        0x74, #Hyper Cannon
-        0x75, #Battle Armor
-        0x76, #Parasuit
-        0x77, #Door
-        0x7E, #Selfix
-        0x7F #Seven Sword
-        )
+    ITEMS = {
+        0x00 : "Hammer",
+        0x01 : "Long Sword",
+        0x02 : "Axe",
+        0x03 : "Battle Sword",
+        0x04 : "Katana",
+        0x05 : "Gold Sword",
+        0x06 : "Coral Sword",
+        0x07 : "Ogre Axe",
+        0x08 : "Dragon Sword",
+        0x09 : "Sun Sword",
+        0x0a : "Flame Sword",
+        0x0b : "Ice Sword",
+        0x0c : "Thunder Axe",
+        0x0d : "Defend Sword",
+        0x0e : "Rune Axe",
+        0x0f : "Rapier",
+        0x10 : "Sabre",
+        0x11 : "Cat Claw",
+        0x12 : "Vampric Sword",
+        0x13 : "Glass Sword",
+        0x14 : "Revenge Sword",
+        0x15 : "Bow",
+        0x16 : "Gold Bow",
+        0x17 : "Bronze Shield",
+        0x18 : "Silver Shield",
+        0x19 : "Gold Shield",
+        0x1A : "Flame Shield",
+        0x1B : "Ice Shield",
+        0x1C : "Dragon Shield",
+        0x1D : "Cure Potion",
+        0x1E : "X-Cure Potion",
+        0x1F : "Curse Potion",
+        0x20 : "Eye Drop",
+        0x21 : "Abacus",
+        0x22 : "Excalibur",
+        0x23 : "Samurai Bow",
+        0x24 : "Cure Book",
+        0x25 : "Prayer Book",
+        0x26 : "Fire Book",
+        0x27 : "Ice Book",
+        0x28 : "Thunder Book",
+        0x29 : "Fog Book",
+        0x2A : "Sleep Book",
+        0x2B : "Stone Book",
+        0x2C : "Death Book",
+        0x2D : "Mage Staff",
+        0x2E : "Wizard Staff",
+        0x2F : "Heal Staff",
+        0x30 : "Flare Book",
+        0x31 : "Bronze Helm",
+        0x32 : "Silver Helm",
+        0x33 : "Gold Helm",
+        0x34 : "Dragon Helm",
+        0x35 : "Bronze Armor",
+        0x36 : "Silver Armor",
+        0x37 : "Gold Armor",
+        0x38 : "Dragon Armor",
+        0x39 : "Arthur Armor",
+        0x3A : "Bronze Gauntlets",
+        0x3B : "Silver Gauntlets",
+        0x3C : "Gold Gauntlets",
+        0x3D : "Giant Gauntlets",
+        0x3E : "Ninja Gauntlets",
+        0x3F : "Hermes Shoes",
+        0x40 : "Hecate Shoes",
+        0x41 : "Elixir",
+        0x42 : "Soft Potion",
+        0x43 : "Power Potion",
+        0x44 : "Speed Potion",
+        0x45 : "Magic Potion",
+        0x46 : "Body Potion",
+        0x47 : "Tent",
+        0x48 : "Whip",
+        0x49 : "Blitz Whip",
+        0x4A : "Chainsaw",
+        0x4B : "Counter",
+        0x4C : "Colt",
+        0x4D : "Musket",
+        0x4E : "Magnum",
+        0x4F : "Punch",
+        0x50 : "Kick",
+        0x51 : "Headbutt",
+        0x52 : "X-Kick",
+        0x53 : "Jyudo",
+        0x54 : "Karate",
+        0x55 : "Temptat",
+        0x56 : "Stun Gun",
+        0x57 : "Heat",
+        0x5A : "SMG",
+        0x5B : "Grenade",
+        0x5C : "Bazooka",
+        0x5D : "Vulcan Cannon",
+        0x5E : "Tank Cannon",
+        0x5F : "Fire Gun",
+        0x60 : "Missile",
+        0x61 : "NukeBomb",
+        0x62 : "Giant Armor",
+        0x63 : "Army Helm",
+        0x64 : "Army Armor",
+        0x65 : "Geta Shoes",
+        0x66 : "Sypha",
+        0x67 : "Coin",
+        0x68 : "Kimono",
+        0x69 : "Samurai Shield",
+        0x6A : "Muramasa",
+        0x6B : "Gungnir",
+        0x6C : "Laser Sword",
+        0x6D : "Psi Knife",
+        0x6E : "Psi Sword",
+        0x6F : "Laser Gun",
+        0x70 : "Speed Up",
+        0x71 : "Rocket",
+        0x72 : "Psi Gun",
+        0x73 : "Giant Helm",
+        0x74 : "Hyper Cannon",
+        0x75 : "Battle Armor",
+        0x76 : "Parasuit",
+        0x77 : "Door",
+        0x7E : "Selfix",
+        0x7F : "Seven Sword"
+        }
 
     #exclude no-header entries
     noMemoCalls = (

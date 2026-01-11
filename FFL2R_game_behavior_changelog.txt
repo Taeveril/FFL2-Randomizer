@@ -1,0 +1,54 @@
+FFLegend 2 Randomizer Game Behavior Changelog:
+Last updated - 01/11/2026
+
+Game behavior here is defined as player expectation from previously playing Final Fantasy Legend 2. Due to the nature of wanting to accomplish 
+various goals in the randomizer, altering game behavior becomes forced. However, most of the game behavior has been retained as much as possible, 
+and often times players might not be aware of the changes. The purpose of this txt file is to chronicle those changes.
+
+- Memo menu removed. Memo calls that prompt dialogue have remained, but most instances of memo-flag setting have been removed from scripting,
+  freeing up a not-insignificant number of bytes.
+  
+- Advancing to the next world calls on magi-count-checks to grant access. This has changed to be event-based instead, save for the pillar to
+  Final World.
+  
+- Ki's shrine only has four NPCs + Ki. This is due to a maximum of six unique NPC sprites on a map, one of which got repurposed to a guardian 
+  helper to let players back into Ki's body. The dialogue text script has been removed and freed up bytes.
+  
+- Venus' world for some reason relied heavily on using magi-count-checks rather than var states. In fixing this, the player no longer requires to 
+  talk to Leon to be let into the sewer. It's a bit of a non-sequitor. Instead the NPC sewer block has a varstate check of 8,0,0 and dialogue 
+  options altered to properly check for var states.
+  
+- Ashura, Venus, and Odin all reused a script that dropped one of each elemental+stat magi. The randomizer gives Ashura and Venus their own, which
+  mimics the drops if magi is unshuffled.
+ 
+- The dragon race as a whole has been rescripted. It no longer relies on doubling up on var usage tied to Ki's body, as well as fixing other bugs,
+  like teleporting out while mounted.
+
+- Due to how world randomization can happen, the Dad death cutscene will now automatically play and at the end put you back at the Ninja World
+  pillar.
+  
+- Giant's World had a magi-count-check on one of the houses to make sure players grab the magi before the micron. This has been removed
+  whole.
+
+- The dragon race now uses the fake dad variable in the first town. It's possible to never see the cutscene if you never enter the first town,
+  beat the race, and then enter the first town for the first time.
+
+- Empty treasure chests are now NPCs, with the treasure chest flags being freed up for other purposes. The knockon effect is they stay around after
+  triggering them.
+  
+- TrueEye Magi doesn't do anything, but it is a magi. Normally sets a variable (5) to allow the player to enter the Cave of Light. Now it uses
+  a proper treasure chest, and the script checks to see if the TrueEye Magi is in the player's possession. This winds up fixing a logical error 
+  where the Cave of Light remains visible even though Apollo steals the magi.
+
+- Giant's World var usage has been extended to include Dad (some reason uses Ashura's world var) and all the way through Ki's body.
+  
+- Ki's body now reuses some Final World variables, but resets them to 0 upon completion.
+
+- Many uses of magi-count-checks have been removed and replace with various var-state checks. The major one that remains is gathering all 76
+  magi to be able to head to Final World.
+
+- Apollo's world has been rescripted to be more randomizer friendly. To be able to move onto the next world, you must defeat Dunatis and exit
+  through the Cave of Light.
+  
+- As of ver 2.0 the Celesial Palace shaking currently does not work, probably due to an effort to free up var 29. This may be fixed eventually,
+  but it is considered extremely low priority.

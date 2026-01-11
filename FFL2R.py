@@ -1,15 +1,25 @@
 import random
-import FFL2R_data
-import FFL2R_utils
-import FFL2R_io
-import FFL2R_bugfixes
-import FFL2R_qol
 import argparse
 import mmap
-from tkinter import Menu, Tk
+
+from tkinter import Tk
 from tkinter.filedialog import askopenfilename
 
-VERSION = 1.0
+import FFL2R_asm
+import FFL2R_manager_base
+from FFL2R_utils import Utility
+from FFL2R_io import File
+from FFL2R_data import GameData
+from FFL2R_manager_scripts import ScriptManager
+from FFL2R_manager_maps import MapManager
+from FFL2R_manager_monsters import MonsterManager
+from FFL2R_manager_economy import ShopManager
+from FFL2R_manager_economy import GoldManager
+from FFL2R_manager_economy import ItemManager
+from FFL2R_manager_world import WorldManager
+
+VERSION = 2.0
+
 
 def main(rom_path:str|None, seed:int|None, encounterRate:int|None, goldDrops:int|None):
     Tk().withdraw()
@@ -37,203 +47,199 @@ def main(rom_path:str|None, seed:int|None, encounterRate:int|None, goldDrops:int
         goldDrops = int(input("Gold adjustment please, 50-500. (Gold dropped is currently capped at 65535.) "))
 
     treasureFlagReclaim = []
-    
-    romData = FFL2R_io.File.readInRom(gameFile)
 
-    FFL2R_bugfixes.AssemblyFixes.missingTrigger(romData)
-    FFL2R_bugfixes.AssemblyFixes.magiFix(romData)
-    FFL2R_bugfixes.AssemblyFixes.mutantStr(romData)
-    FFL2R_bugfixes.AssemblyFixes.forceRaceDismount(romData)
-    FFL2R_bugfixes.AssemblyFixes.goldDropFix(romData)
+    romData = File.readInRom(gameFile)
 
-    FFL2R_qol.AssemblyQOL.moveHax(romData)
-    FFL2R_qol.AssemblyQOL.textHax(romData)
-    FFL2R_qol.AssemblyQOL.betterGrowth(romData)
+    FFL2R_asm.Fixes.missingTrigger(romData)
+    FFL2R_asm.Fixes.magiFix(romData)
+    FFL2R_asm.Fixes.mutantStr(romData)
+    FFL2R_asm.Fixes.forceRaceDismount(romData)
+    FFL2R_asm.Fixes.goldDropFix(romData)
 
-    maps = FFL2R_io.MapData(romData, 0x1c800, 0x1e5f8,0x1e6ff, 0x1c000, 0x1ef80, 0x1efff)
-    scriptingBlock1 = FFL2R_io.ScriptBlock(romData, 0x2c000, 0x2eb7f, 0x28000)
-    scriptingBlock2 = FFL2R_io.ScriptBlock(romData, 0x28000, 0x2be3e, 0x24000)
-    battleBlock = FFL2R_io.ScriptBlock(romData, 0x2eb80, 0x2f3ff, 0x28000)
-    menuBlock = FFL2R_io.ScriptBlock(romData, 0x2f400, 0x2ffcf, 0x28000)
-    shops = FFL2R_io.ShopData(romData, 0x3f9e0, 0x3fa9f)
-    goldTable = FFL2R_io.GoldData(romData, 0x33e50, 0x33e7f)
-    monsterTable = FFL2R_io.MonsterData(romData, 0x33800, 0x33d50, 0x36400, 0x36b70, 0x36f80, 0x3eec0, 0x33c50)
-    memoBlock = FFL2R_io.ScriptBlock(romData, 0x3c250, 0x3e07f, 0x38000)
-    memoBlock.headerData.blockStart = 0x3c270
-    memoBlock.headerData.blockEnd = 0x3c46f
-    memoBlock.headerData.addr = memoBlock.headerData.getAddr(romData)
-    memoBlock.script = memoBlock.getData(romData)
+    FFL2R_asm.QOL.moveHax(romData)
+    FFL2R_asm.QOL.textHax(romData)
+    FFL2R_asm.QOL.betterGrowth(romData)
 
-    FFL2R_bugfixes.ScriptedFixes.moveMrS(scriptingBlock1, maps)
-    FFL2R_bugfixes.ScriptedFixes.fixTheRace(scriptingBlock1, scriptingBlock2, maps)
+    scripts = ScriptManager(romData)
+    maps = MapManager(romData)
+    monsters = MonsterManager(romData)
+    shops = ShopManager(romData)
+    gold = GoldManager(romData)
+    items = ItemManager(romData)
+    worlds = WorldManager()
 
-    FFL2R_utils.GamePrep.newTitleScreen(menuBlock, VERSION, gameSeed)
-    FFL2R_utils.GamePrep.magiCheckRedo(scriptingBlock1, scriptingBlock2, maps, treasureFlagReclaim)
-    FFL2R_utils.GamePrep.newDropScripts(scriptingBlock1, scriptingBlock2)
-    FFL2R_utils.GamePrep.kiShrineCleanup(scriptingBlock1, scriptingBlock2, maps)
-    FFL2R_utils.GamePrep.memoRemove(scriptingBlock1, scriptingBlock2, menuBlock, memoBlock, romData)
-    FFL2R_utils.GamePrep.venusWorldCleanup(scriptingBlock1, scriptingBlock2, memoBlock, maps)
-    FFL2R_utils.GamePrep.dadDeathCutscenes(scriptingBlock1, scriptingBlock2, memoBlock)
-    FFL2R_utils.GamePrep.nastyChest(scriptingBlock1, maps) 
-    FFL2R_utils.GamePrep.prismDummy(menuBlock)
-    FFL2R_utils.GamePrep.newCredits(memoBlock)
+    FFL2R_manager_base.ScriptedFixes.moveMrS(scripts, maps)
+    FFL2R_manager_base.ScriptedFixes.fixTheRace(scripts, maps)
 
-    FFL2R_qol.ScriptedQOL.newNPCHelpers(scriptingBlock1, scriptingBlock2, maps)
+    FFL2R_manager_base.GamePrep.newTitleScreen(scripts, gameSeed)
+    FFL2R_manager_base.GamePrep.newDropScripts(scripts)
+    FFL2R_manager_base.GamePrep.kiShrineCleanup(scripts, maps)
+    FFL2R_manager_base.GamePrep.memoRemove(scripts, romData)
+    FFL2R_manager_base.GamePrep.venusWorldCleanup(scripts, maps)
+    FFL2R_manager_base.GamePrep.dadDeathCutscenes(scripts)
+    FFL2R_manager_base.GamePrep.warMachAdjust(scripts, maps, treasureFlagReclaim)
+    FFL2R_manager_base.GamePrep.nastyChest(scripts, maps)
+    FFL2R_manager_base.GamePrep.prismDummy(scripts)
+    FFL2R_manager_base.GamePrep.newCredits(scripts)
 
-    magiShuffle(scriptingBlock1, scriptingBlock2, memoBlock, maps, FFL2R_data.GameData.magi)
-    treasureShuffle(maps, scriptingBlock2, FFL2R_data.GameData.treasures, treasureFlagReclaim)
-    shopRando(shops, FFL2R_data.GameData.shopTiers)
-    worldShuffle(romData, maps, scriptingBlock1, scriptingBlock2, FFL2R_data.GameData.pillarsWorlds)
+    worlds.magiCheckRedo(scripts, maps)
 
-    FFL2R_utils.GamePrep.convertToRealChests(scriptingBlock1, maps, treasureFlagReclaim)
+    FFL2R_manager_base.ScriptedQOL.newNPCHelpers(scripts, maps)
 
-    newStarters(monsterTable, menuBlock)
+    magiShuffle(scripts, maps, GameData.MAGI)
+    treasureShuffle(maps, scripts, GameData.TREASURES, treasureFlagReclaim)
+    shopRando(shops, GameData.shopTiers)
+    worldShuffle(romData, maps, scripts, worlds)
+
+    FFL2R_manager_base.GamePrep.convertToRealChests(scripts, maps, treasureFlagReclaim)
+
+    newStarters(monsters, scripts)
 
     if encounterRate != 100:
-        encounterRate = FFL2R_utils.Utility.setBoundaries(encounterRate, 20, 200)
+        encounterRate = Utility.setBoundaries(encounterRate, 20, 200)
         encounterRateAdjustment(maps, encounterRate)
 
     if goldDrops != 100:
-        goldDrops = FFL2R_utils.Utility.setBoundaries(goldDrops, 50, 500)
-        goldAdjustment(goldTable, goldDrops)
+        goldDrops = Utility.setBoundaries(goldDrops, 50, 500)
+        goldAdjustment(gold, goldDrops)
     
-    for k,v in FFL2R_data.GameData.newItemPrices.items():
-         romData[k] = v
+    for k,v in GameData.newItemPrices.items():
+         items.item[k].setPrice(v)
 
-    romData = FFL2R_io.File.editRom(romData, scriptingBlock1, scriptingBlock2, menuBlock, memoBlock, maps, shops, goldTable, 
-                                    monsterTable)
+    print(scripts.findScriptByBytes('1300'))
 
-    FFL2R_io.File.writeOutRom(romData, gameSeed, encounterRate, goldDrops)
-    print("Done!")
+    romData = File.editRom(romData, scripts, maps, shops, monsters, gold, items)
+    File.writeOutRom(romData, gameSeed, encounterRate, goldDrops)
+    print("            Randomizer finished successfully. Right on!")
 
-def goldAdjustment(goldTable:FFL2R_io.GoldData, rate:int):
+
+def goldAdjustment(gold:GoldManager, rate:int):
     percent = rate / 100
 
-    for v in goldTable.table.values():
-        gold = int(v.actualValue * percent)
+    for v in gold.dropValue.values():
+        g = int(v.actualValue * percent)
         #10% stack bonus causes overflow issues, so capped at 59578
-        if gold > 59578:
-            gold = 59578
-        v.actualValue = gold
-        v.updateGold(gold)
+        if g > 59578:
+            g = 59578
+        v.actualValue = g
+        v.updateGold(g)
 
-def encounterRateAdjustment(maps:FFL2R_io.MapData, rate:int):
+def encounterRateAdjustment(maps:MapManager, rate:int):
     percent = rate / 100
 
     #if a map's encounter rate is 0, it winds up for a default encounter rate somehow. So it floors at 1.
-    for v in maps.header.values():
+    for v in maps.map.values():
         if v.isDangerous == True:
             v.encounterRate = int(v.encounterRate * percent)
             if v.encounterRate == 0:
                 v.encounterRate = 1
 
-def treasureShuffle(mapHeaders:FFL2R_io.MapData, scriptingBlock2:FFL2R_io.ScriptBlock, treasures:list, treasureFlagReclaim:list):
+def treasureShuffle(maps:MapManager, scripts:ScriptManager, treasures:list, treasureFlagReclaim:list):
     treasuresList = treasures
     random.shuffle(treasuresList)
-    #0=npc, 1=treasures, 2=magi
-    treasureChests = mapHeaders.findNPCs(1)
+    #0=treasures, 1=magi
+    treasureChests = maps.findNPCs(0) #change this to 0
     for chest in treasureChests:
-        chest[2][4] = treasuresList[0]
+        newChest = bytearray.fromhex(chest[2][0:12] + f"{treasuresList[0]:02x}" + chest[2][15:17])
         if treasuresList[0] == 0xFF:
-            x = FFL2R_utils.Utility.findCoordinate(chest[2][2])
-            y = FFL2R_utils.Utility.findCoordinate(chest[2][3])
+            x, y = Utility.findCoordinate(int(chest[2][6:8], 16)), Utility.findCoordinate(int(chest[2][9:11], 16))
             treasureFlagReclaim.append(chest[2][1])
-            chest[2] = [0x0, 0xf, x+0x40, y+0xc0, 0x3, 0xf1]
+            newChest = bytearray.fromhex('00 0f ' + f"{x+0x40:02x}" + f"{y+0xc0:02x}" + '03 f1')
         treasuresList.pop(0)
-        mapHeaders.header[chest[0]].npcs[chest[1]] = chest[2]
-    startGift = random.randint(0, len(FFL2R_data.GameData.itemList))
-    scriptingBlock2.script[19].scriptData[26] = FFL2R_data.GameData.itemList[startGift]
-    scriptingBlock2.script[19].scriptData[41] = FFL2R_data.GameData.itemList[startGift]
+        maps.map[chest[0]].npcs[chest[1]] = newChest
+    startGift = random.choice(list(GameData.ITEMS.keys()))
+    scripts.main[275][26] = startGift
+    scripts.main[275][41] = startGift
 
-def magiShuffle(scriptingBlock1:FFL2R_io.ScriptBlock, scriptingBlock2:FFL2R_io.ScriptBlock, memoBlock:FFL2R_io.ScriptBlock, mapHeaders:FFL2R_io.MapData, magi:list):
+def magiShuffle(scripts:ScriptManager, maps:MapManager, magi:list):
+    def _newMagi(scripts:ScriptManager, magiList:list, x:int, y:int):
+        scripts.main[x][y] = magiList[0]
+        magiList.pop(0)
     magiList = magi
     random.shuffle(magiList)
-    magiChests = mapHeaders.findNPCs(2)
+    magiChests = maps.findNPCs(1)
     raceMagi = []
-    leonsMagi = 0x00 #in bank 2
+    leonsMagi = 0x00
     for chest in magiChests:
-        chest[2][4] = magiList[0]
+        newChest = bytearray.fromhex(chest[2][0:12] + f"{magiList[0]:02x}" + chest[2][15:17])
         magiList.pop(0)
-        mapHeaders.header[chest[0]].npcs[chest[1]] = chest[2]
-    scriptList = scriptingBlock1.findScriptsByBytes([0x19, 0x0A])
+        maps.map[chest[0]].npcs[chest[1]] = newChest
+    scriptList = scripts.findScriptByBytes('19 0a')
     for script in scriptList:
-        if script[0] != 86: #skip trueeye script
-            scriptingBlock1.script[script[0]].scriptData[script[1]+2] = magiList[0]
+        if script[0] == 3:
+            scripts.memo[script[1]][script[2]+2] = magiList[0]
             magiList.pop(0)
-    scriptList = scriptingBlock2.findScriptsByBytes([0x19, 0x0A])
-    for script in scriptList:
-        scriptingBlock2.script[script[0]].scriptData[script[1]+2] = magiList[0]
-        if script[0] == 164: #leon's return cutscene
-            leonsMagi = magiList[0] #leon's theft
-            scriptingBlock1.replaceScript(54, FFL2R_utils.GamePrep.leonsText(leonsMagi))
-        if script[0] in (201, 202, 203): #race scripts
-            raceMagi.append(magiList[0])
-        magiList.pop(0)
-        if script[0] == 204 and raceMagi: #slow dragon race script
-            magiList.insert(0, raceMagi[0])
-            raceMagi.pop(0)
-    scriptList = memoBlock.findScriptsByBytes([0x19, 0x0A])
-    for script in scriptList:
-        memoBlock.script[script[0]].scriptData[script[1]+2] = magiList[0]
-        magiList.pop(0)
+        else:
+            match script[1]:
+                case 86: #skip trueeye script
+                    pass
+                case 420: #leon's return cutscene
+                    leonsMagi = magiList[0] #leon's theft
+                    scripts.replaceScript(0, 54, FFL2R_manager_base.GamePrep.leonsText(leonsMagi))
+                    _newMagi(scripts, magiList, script[1], script[2]+2)
+                case 457|458|459:
+                    raceMagi.append(magiList[0])
+                    _newMagi(scripts, magiList, script[1], script[2]+2)
+                case 460:
+                    if script[2] != 24:#position 24 signifies the first magi reward and should avoid using racemagi
+                        magiList.insert(0, raceMagi[0])
+                        raceMagi.pop(0)
+                    _newMagi(scripts, magiList, script[1], script[2]+2)
+                case _:
+                    _newMagi(scripts, magiList, script[1], script[2]+2)
 
-def shopRando(shops:FFL2R_io.ShopData, tiers:list):
-    def mixTier(tierData:list)->list:
+def shopRando(shops:ShopManager, tiers:list):
+    def _mixTier(tierData:list)->list:
         random.shuffle(tierData)
         return tierData
-    def populateShop(currentShop:list, count:int, availableItems:list, *extraItems:list):
+    def _populateShop(currentShop:list, count:int, availableItems:list, *bonusItems:list):
         for i in range(0, count):
-            if random.randint(0,3) == 3 and len(extraItems) > 0:
-                currentShop[i] = extraItems[0][i]
+            if random.randint(0,3) == 3 and bonusItems:
+                currentShop[i] = bonusItems[0][i]
             else:
                 currentShop[i] = availableItems[i]
-            i+=1
-        if count < 8 and random.randint(0,2) >= 1 and len(extraItems) > 1:
-                currentShop[i] = extraItems[1][0]
         return currentShop
 
-    for v in shops.data.values():
-        currentShop = [0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]
+    for v in shops.shop.values():
+        currentShop = bytearray.fromhex('FF FF FF FF FF FF FF FF')
         length = random.randint(6,8)
         match v.tier:
             case 0: #recurring
                 currentShop = tiers[8]
             case 7: #final shop
-                items = mixTier(tiers[7])
-                currentShop = populateShop(currentShop, 8, items)
+                currentShop = tiers[0]
+                items = _mixTier(tiers[7])
+                currentShop.append(items[0])
             case 8: #Echigoya will always have a full stock of eight items
-                items = mixTier(tiers[7]+tiers[0])
-                currentShop = populateShop(currentShop, 8, items)             
+                items = _mixTier(tiers[7])
+                currentShop = _populateShop(currentShop, 8, items)             
             case 9: #giant town special, grab from 0 first then 6/7
-                items = mixTier(tiers[0])
-                bonusItems = mixTier(tiers[6]+tiers[7])
-                items = items + bonusItems
-                currentShop = populateShop(currentShop, length, items)
+                items = _mixTier(tiers[6]+tiers[7])
+                currentShop = _populateShop(currentShop, length, items)
             case _: #most other shops
-                items = mixTier(tiers[v.tier])
-                bonusItems = mixTier(tiers[v.tier+1])
-                specialItems = mixTier(tiers[0])
-                currentShop = populateShop(currentShop, length, items, bonusItems, specialItems)
+                items = _mixTier(tiers[v.tier])
+                bonusItems = _mixTier(tiers[v.tier+1])
+                currentShop = _populateShop(currentShop, length, items, bonusItems)
         v.wares = currentShop
 
-def newStarters(monsterBlock:FFL2R_io.MonsterData, menuBlock:FFL2R_io.ScriptBlock):
+def newStarters(monsters:MonsterManager, scripts:ScriptManager):
     randoMonsters = random.sample(range(180),3)
     for starter in randoMonsters:
         starterIndex = randoMonsters.index(starter)
-        monsterBlock.data[245+starterIndex].monsterFamily = monsterBlock.data[starter].monsterFamily
-        monsterBlock.data[245+starterIndex].monsterAI = monsterBlock.data[starter].monsterAI
-        monsterBlock.data[245+starterIndex].monsterGFX = monsterBlock.data[starter].monsterGFX
-        monsterBlock.data[245+starterIndex].monsterNPC = monsterBlock.data[starter].monsterNPC
-        monsterBlock.data[245+starterIndex].statArray = monsterBlock.data[starter].statArray
-        monsterBlock.data[245+starterIndex].skillLength = monsterBlock.data[starter].skillLength
-        monsterBlock.data[245+starterIndex].skillList = monsterBlock.data[starter].skillList
-        monsterBlock.data[245+starterIndex].name = monsterBlock.data[starter].name
-        monsterBlock.data[245+starterIndex].goldIndex = monsterBlock.data[starter].goldIndex
+        monsters.monster[245+starterIndex].family = monsters.monster[starter].family
+        monsters.monster[245+starterIndex].ai = monsters.monster[starter].ai
+        monsters.monster[245+starterIndex].gfx= monsters.monster[starter].gfx
+        monsters.monster[245+starterIndex].npc = monsters.monster[starter].npc
+        monsters.monster[245+starterIndex].stats = monsters.monster[starter].stats
+        monsters.monster[245+starterIndex].skillsLength = monsters.monster[starter].skillsLength
+        monsters.monster[245+starterIndex].skills = monsters.monster[starter].skills
+        monsters.monster[245+starterIndex].name = monsters.monster[starter].name
+        monsters.monster[245+starterIndex].goldIndex = monsters.monster[starter].goldIndex
 
-        if monsterBlock.data[starter].dslevel < 10:
-            hexLevel = [0xFF, 0xFF, 0xB0 + monsterBlock.data[starter].dslevel]
+        if monsters.monster[starter].dslevel < 10:
+            hexLevel = 'FF FF' + f"{0xB0 + monsters.monster[starter].dslevel:02x}"
         else:
-            hexLevel = [0xFF, 0xB1, (0xB0 + (monsterBlock.data[starter].dslevel - 10))]
+            hexLevel = 'FF B1' + f"{(0xB0 + (monsters.monster[starter].dslevel - 10)):02x}"
         match starterIndex:
             case 0:
                 pos = 69
@@ -241,62 +247,68 @@ def newStarters(monsterBlock:FFL2R_io.MonsterData, menuBlock:FFL2R_io.ScriptBloc
                 pos = 83
             case 2:
                 pos = 97
-        menuBlock.insertIntoScript(21, pos, hexLevel)
+        scripts.insertIntoScript(2, 21, pos, hexLevel)
 
-def worldShuffle(romData:mmap, mapHeaders:FFL2R_io.MapData, scriptingBlock1:FFL2R_io.ScriptBlock, scriptingBlock2:FFL2R_io.ScriptBlock, pillarsWorlds:dict):
+def worldShuffle(romData:mmap, maps:MapManager, scripts:ScriptManager, worlds:WorldManager):
     warpScripts = {}
+    startaddr = worlds.WORLD_NAME_STARTADDR
     warpNames = {}
-    newWorldOrder = list(pillarsWorlds.values())
+    scriptIndex = 0
+    #prismArray = []
+    #prismLoc = 0x3e600
+    teleCounter = 2
+    finalStore = list(worlds.finalStore.values())
+    maps.map[finalStore[0][1]].npcs[finalStore[0][2]][0] = 0x10
+    maps.map[finalStore[0][1]].npcs[finalStore[0][2]][1] = 0x1f
+    maps.map[finalStore[1][1]].npcs[finalStore[1][2]][0] = 0x10
+    maps.map[finalStore[1][1]].npcs[finalStore[1][2]][1] = 0x1f
+    newWorldOrder = list(worlds.world.values())
     for world in newWorldOrder:
-        if world[3]:
-            for s in world[3]:
-                warpScripts[s] = scriptingBlock1.script[s].scriptData
-        if world[4]:
-            for loc in world[4]:
+        if world.teleportScripts:
+            for s in world.teleportScripts:
+                warpScripts[s] = scripts.main[s]
+        if world.nameAddr:
+            for loc in world.nameAddr:
                 name = []
                 for x in range(0, 16):
                    name.append(romData[loc+x])
                 warpNames[loc] = name
     random.shuffle(newWorldOrder)
-    scriptIndex = 0
-    prismArray = []
-    prismLoc = 0x3e600
-    teleCounter = 2
-    j = 0x3f6f0
-    for k in pillarsWorlds.keys():
+    for v in worlds.pillar.values():
         gWorld = False
-        if newWorldOrder[0][0] == 87:
+        if newWorldOrder[0].isScript:
             gWorld = True
             trigger = [87,0]
-        elif newWorldOrder[0][0] > 255:
-            trigger = [newWorldOrder[0][0]-256, 6]
+        elif newWorldOrder[0].doorIn > 255:
+            trigger = [newWorldOrder[0].doorIn-256, 6]
         else:
-            trigger = [newWorldOrder[0][0], 5]
-        mapHeaders.header[k[0]].triggerRef[k[1]] = trigger
-        mapHeaders.header[k[0]].triggerRef[k[3]] = [newWorldOrder[0][6],0]
-        if k[2] > 255:
-            trigger = [k[2] - 256, 6]
+            trigger = [newWorldOrder[0].doorIn, 5]
+        maps.map[v.mapPillarID].triggers[v.doorInMapIndex] = trigger
+        maps.map[v.mapPillarID].triggers[v.mapPillarTriggerIndexPrism] = [newWorldOrder[0].prismScript ,0]
+        if v.doorOut > 255:
+            trigger = [v.doorOut - 256, 6]
         else:
-            trigger = [k[2], 5]
-        mapHeaders.header[newWorldOrder[0][1]].triggerRef[newWorldOrder[0][2]] = trigger
+            trigger = [v.doorOut, 5]
+        maps.map[newWorldOrder[0].mapID].triggers[newWorldOrder[0].doorOutMapIndex] = trigger
         if gWorld == True:
-            mapHeaders.header[90].triggerRef[0] = trigger
-        if newWorldOrder[0][3]:
-            for s in newWorldOrder[0][3]:
-                scriptingBlock1.replaceScript(99+scriptIndex, warpScripts[s])
+            maps.map[90].triggers[0] = trigger
+        if newWorldOrder[0].teleportScripts:
+            for s in newWorldOrder[0].teleportScripts:
+                scripts.replaceScript(0, 99+scriptIndex, warpScripts[s].hex(" "))
                 scriptIndex+=1
-        if newWorldOrder[0][4]:
-            for loc in newWorldOrder[0][4]:
+        if newWorldOrder[0].nameAddr:
+            for loc in newWorldOrder[0].nameAddr:
                 for x in range(0,16):
-                    romData[j] = warpNames[loc][x]
-                    j+=1
-        if newWorldOrder[0][5]:
-            teleCounter+=newWorldOrder[0][5][3]
-            if newWorldOrder[0][5][0] == 1:
-                scriptingBlock2.script[newWorldOrder[0][5][1]].scriptData[newWorldOrder[0][5][2]+2] = teleCounter
-            else:
-                scriptingBlock1.script[newWorldOrder[0][5][1]].scriptData[newWorldOrder[0][5][2]+2] = teleCounter
-        prismArray.append(newWorldOrder[0][7])
+                    romData[startaddr] = warpNames[loc][x]
+                    startaddr+=1
+        if newWorldOrder[0].scriptTeleportUnlockByte:
+            teleCounter+=newWorldOrder[0].scriptTeleportUnlockByte[2]
+            scripts.main[newWorldOrder[0].scriptTeleportUnlockByte[0]][newWorldOrder[0].scriptTeleportUnlockByte[1]+2] = teleCounter
+    #    prismArray.append(newWorldOrder[0].prismCount)
+        for x in finalStore:
+            if x[0] == newWorldOrder[0].index:
+                maps.map[x[1]].npcs[x[2]][0] = 0x10
+                maps.map[x[1]].npcs[x[2]][1] = (v.order*16)+15
         newWorldOrder.pop(0)
     # for x in range(0,14):
     #     match x:
@@ -310,13 +322,7 @@ def worldShuffle(romData:mmap, mapHeaders:FFL2R_io.MapData, scriptingBlock1:FFL2
     #             romData[prismLoc + 8] = romData[prismLoc + 7] + 1
     #         case _:
     #             romData[prismLoc + x] = romData[prismLoc + x - 1] + prismArray[0]
-    #             prismArray.pop(0)
-
-
-
-
-
-            
+    #             prismArray.pop(0)      
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
