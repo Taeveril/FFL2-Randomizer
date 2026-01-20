@@ -305,6 +305,13 @@ class GamePrep:
         scripts.insertIntoScriptAtEnd(0, 89, '15 05 12 12 05 12 05 15 05 44 12 10 12 05 00')
         scripts.insertIntoScriptAtEnd(0, 350, '12 05')
 
+    def guardianBaseLogic(maps:MapManager):
+            maps.map[90].npcs[0][1] = 0x77
+            maps.map[92].npcs[0][1] = 0x66
+            maps.map[93].npcs[0][1] = 0x55
+            maps.map[93].npcs[1][1] = 0x44
+            maps.map[94].npcs[0][1] = 0x33
+
     def nastyChest(scripts:ScriptManager, maps:MapManager):
         #29
         scripts.replaceScript(0, 82, '15 11 11 19 00 53 0e 19 f0 00 ff 14 11 01 14 1e 02 19 07 0d 00')

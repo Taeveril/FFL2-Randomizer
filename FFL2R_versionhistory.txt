@@ -1,5 +1,10 @@
 Final Fantasy Legend 2 Randomizer Version History
 
+Version 2.1.0 (1/19/2026):
+	Added an "open world" option to the randomizer. Generating seeds will now require an input on how worlds should be shuffled (-w).
+	Fixed an issue where teleporting during Guardian Base could break logic and put players in a bad state.
+	Made it so teleporting to Guardian Base will now check where you are in that world's progression.
+
 Version 2.0.0 (1/11/2026):
 	Rewrote entire codebase again, trying to adopt pythonic principles...sort of.
 	Redid Final Shop logic. The NPC will now appear after world completion.

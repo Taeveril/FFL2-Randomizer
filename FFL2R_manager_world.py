@@ -76,9 +76,9 @@ class WorldManager():
             self.prismScript = prismScript
             self.prismCount = prismCount
 
-    def magiCheckRedo(self, scripts:ScriptManager, maps:MapManager):
+    def magiCheckRedo(self, scripts:ScriptManager, maps:MapManager, worldType:int):
         #most var16 incs are in the respective rescript events. 
-
+        #repurpose 72/73 to teleport to appropriate guardian world
         maps.remNPC(15,4)
         scripts.replaceScript(0, 24, '00')
         maps.remNPC(39,1)
@@ -93,7 +93,7 @@ class WorldManager():
         scripts.replaceScript(0, 69, '14 10 0b 10 06 36 05 c8 e3 8b 8f f3 0b 0d 19 f0 01 ff 00 00')
         scripts.replaceScript(0, 70, 'ff d0 4e e0 8e 54 d6 81 e3 98 7f 06 58 67 69 50 53 5e 66 df d7 e6 06 5d 69 e3 8b 4f 70 52 d7 e2 66 f3 00')
         scripts.replaceScript(0, 72, '00')
-        scripts.replaceScript(0, 73, '00')
+        scripts.replaceScript(0, 104, '19 00 5f 14 0e 06 15 06 02 19 05 e5 0e 19 05 ec 00')
         scripts.replaceScript(0, 74, '00')
         scripts.replaceScript(0, 75, '00')
         scripts.replaceScript(0, 76, '00')
@@ -101,7 +101,10 @@ class WorldManager():
  
         for v in self.pillar.values():
             if (v.nextPillarVar16Check):
-                maps.map[v.mapPillarID].npcs[0][1] = v.nextPillarVar16Check
+                if worldType != 2:
+                    maps.map[v.mapPillarID].npcs[0][1] = v.nextPillarVar16Check
+                else:
+                    maps.map[v.mapPillarID].npcs[0][1] = 0x00
                 maps.map[v.mapPillarID].npcs[0][4] = 0x00
                 maps.map[v.mapPillarID].npcs[0][5]+=0x01
  

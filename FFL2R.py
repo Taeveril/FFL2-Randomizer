@@ -21,7 +21,7 @@ from FFL2R_manager_world import WorldManager
 VERSION = 2.0
 
 
-def main(rom_path:str|None, seed:int|None, encounterRate:int|None, goldDrops:int|None):
+def main(rom_path:str|None, seed:int|None, encounterRate:int|None, goldDrops:int|None, worldType:int|None):
     Tk().withdraw()
     if not rom_path:
         gameFile = askopenfilename(title="First, please point to the FFL2 rom.")
@@ -30,7 +30,7 @@ def main(rom_path:str|None, seed:int|None, encounterRate:int|None, goldDrops:int
 
     #  seeding
     if not seed:
-        gameSeed_str = str(input("Seed please. Blank will generate a random number."))
+        gameSeed_str = str(input("Seed please. Blank will generate a random number. \n>>"))
         try:
             gameSeed = int(gameSeed_str)
             gameSeed = abs(gameSeed)
@@ -41,10 +41,16 @@ def main(rom_path:str|None, seed:int|None, encounterRate:int|None, goldDrops:int
     random.seed(gameSeed)    
 
     if not encounterRate:
-        encounterRate = int(input("Encounter rate please, 20-200. "))          
+        encounterRate = int(input("Encounter rate please, 20-200. >>"))          
 
     if not goldDrops:
-        goldDrops = int(input("Gold adjustment please, 50-500. (Gold dropped is currently capped at 65535.) "))
+        goldDrops = int(input("Gold adjustment please, 50-500. (Gold dropped is currently capped at 65535.)\n>>"))
+
+    if not worldType:
+        worldType = int(input("Choose a world order type: 1 = Vanilla, 2 = Shuffle, 3 = Open\n>>"))
+    if worldType < 1 or worldType > 3:
+        raise Exception("Invalid World Order Selection.")
+
 
     treasureFlagReclaim = []
 
@@ -80,16 +86,15 @@ def main(rom_path:str|None, seed:int|None, encounterRate:int|None, goldDrops:int
     FFL2R_manager_base.GamePrep.warMachAdjust(scripts, maps, treasureFlagReclaim)
     FFL2R_manager_base.GamePrep.nastyChest(scripts, maps)
     FFL2R_manager_base.GamePrep.prismDummy(scripts)
+    FFL2R_manager_base.GamePrep.guardianBaseLogic(maps)
     FFL2R_manager_base.GamePrep.newCredits(scripts)
-
-    worlds.magiCheckRedo(scripts, maps)
 
     FFL2R_manager_base.ScriptedQOL.newNPCHelpers(scripts, maps)
 
     magiShuffle(scripts, maps, GameData.MAGI)
     treasureShuffle(maps, scripts, GameData.TREASURES, treasureFlagReclaim)
     shopRando(shops, GameData.shopTiers)
-    worldShuffle(romData, maps, scripts, worlds)
+    worldShuffle(romData, maps, scripts, worlds, worldType)
 
     FFL2R_manager_base.GamePrep.convertToRealChests(scripts, maps, treasureFlagReclaim)
 
@@ -106,10 +111,9 @@ def main(rom_path:str|None, seed:int|None, encounterRate:int|None, goldDrops:int
     for k,v in GameData.newItemPrices.items():
          items.item[k].setPrice(v)
 
-    print(scripts.findScriptByBytes('1300'))
-
     romData = File.editRom(romData, scripts, maps, shops, monsters, gold, items)
-    File.writeOutRom(romData, gameSeed, encounterRate, goldDrops)
+
+    File.writeOutRom(romData, gameSeed, encounterRate, goldDrops, worldType)
     print("            Randomizer finished successfully. Right on!")
 
 
@@ -138,7 +142,7 @@ def treasureShuffle(maps:MapManager, scripts:ScriptManager, treasures:list, trea
     treasuresList = treasures
     random.shuffle(treasuresList)
     #0=treasures, 1=magi
-    treasureChests = maps.findNPCs(0) #change this to 0
+    treasureChests = maps.findNPCs(0)
     for chest in treasureChests:
         newChest = bytearray.fromhex(chest[2][0:12] + f"{treasuresList[0]:02x}" + chest[2][15:17])
         if treasuresList[0] == 0xFF:
@@ -249,7 +253,7 @@ def newStarters(monsters:MonsterManager, scripts:ScriptManager):
                 pos = 97
         scripts.insertIntoScript(2, 21, pos, hexLevel)
 
-def worldShuffle(romData:mmap, maps:MapManager, scripts:ScriptManager, worlds:WorldManager):
+def worldShuffle(romData:mmap, maps:MapManager, scripts:ScriptManager, worlds:WorldManager, worldType:int):
     warpScripts = {}
     startaddr = worlds.WORLD_NAME_STARTADDR
     warpNames = {}
@@ -258,58 +262,71 @@ def worldShuffle(romData:mmap, maps:MapManager, scripts:ScriptManager, worlds:Wo
     #prismLoc = 0x3e600
     teleCounter = 2
     finalStore = list(worlds.finalStore.values())
-    maps.map[finalStore[0][1]].npcs[finalStore[0][2]][0] = 0x10
-    maps.map[finalStore[0][1]].npcs[finalStore[0][2]][1] = 0x1f
-    maps.map[finalStore[1][1]].npcs[finalStore[1][2]][0] = 0x10
-    maps.map[finalStore[1][1]].npcs[finalStore[1][2]][1] = 0x1f
+    worlds.magiCheckRedo(scripts, maps, worldType)
+    if worldType != 1:
+        maps.map[finalStore[0][1]].npcs[finalStore[0][2]][0] = 0x10
+        maps.map[finalStore[0][1]].npcs[finalStore[0][2]][1] = 0x1f
+        maps.map[finalStore[1][1]].npcs[finalStore[1][2]][0] = 0x10
+        maps.map[finalStore[1][1]].npcs[finalStore[1][2]][1] = 0x1f
+        if worldType == 3:
+            for world in worlds.world.values():
+                for x in finalStore:
+                    if x[0] == world.index:
+                        maps.map[x[1]].npcs[x[2]][0] = 0x00
+                        maps.map[x[1]].npcs[x[2]][1] = 0x0F
+                if world.scriptTeleportUnlockByte:
+                    scripts.main[world.scriptTeleportUnlockByte[0]][world.scriptTeleportUnlockByte[1]+2] = 0x0D
     newWorldOrder = list(worlds.world.values())
-    for world in newWorldOrder:
-        if world.teleportScripts:
-            for s in world.teleportScripts:
-                warpScripts[s] = scripts.main[s]
-        if world.nameAddr:
-            for loc in world.nameAddr:
-                name = []
-                for x in range(0, 16):
-                   name.append(romData[loc+x])
-                warpNames[loc] = name
-    random.shuffle(newWorldOrder)
-    for v in worlds.pillar.values():
-        gWorld = False
-        if newWorldOrder[0].isScript:
-            gWorld = True
-            trigger = [87,0]
-        elif newWorldOrder[0].doorIn > 255:
-            trigger = [newWorldOrder[0].doorIn-256, 6]
-        else:
-            trigger = [newWorldOrder[0].doorIn, 5]
-        maps.map[v.mapPillarID].triggers[v.doorInMapIndex] = trigger
-        maps.map[v.mapPillarID].triggers[v.mapPillarTriggerIndexPrism] = [newWorldOrder[0].prismScript ,0]
-        if v.doorOut > 255:
-            trigger = [v.doorOut - 256, 6]
-        else:
-            trigger = [v.doorOut, 5]
-        maps.map[newWorldOrder[0].mapID].triggers[newWorldOrder[0].doorOutMapIndex] = trigger
-        if gWorld == True:
-            maps.map[90].triggers[0] = trigger
-        if newWorldOrder[0].teleportScripts:
-            for s in newWorldOrder[0].teleportScripts:
-                scripts.replaceScript(0, 99+scriptIndex, warpScripts[s].hex(" "))
-                scriptIndex+=1
-        if newWorldOrder[0].nameAddr:
-            for loc in newWorldOrder[0].nameAddr:
-                for x in range(0,16):
-                    romData[startaddr] = warpNames[loc][x]
-                    startaddr+=1
-        if newWorldOrder[0].scriptTeleportUnlockByte:
-            teleCounter+=newWorldOrder[0].scriptTeleportUnlockByte[2]
-            scripts.main[newWorldOrder[0].scriptTeleportUnlockByte[0]][newWorldOrder[0].scriptTeleportUnlockByte[1]+2] = teleCounter
-    #    prismArray.append(newWorldOrder[0].prismCount)
-        for x in finalStore:
-            if x[0] == newWorldOrder[0].index:
-                maps.map[x[1]].npcs[x[2]][0] = 0x10
-                maps.map[x[1]].npcs[x[2]][1] = (v.order*16)+15
-        newWorldOrder.pop(0)
+    if worldType == 2:
+        for world in newWorldOrder:
+            if world.teleportScripts:
+                for s in world.teleportScripts:
+                    warpScripts[s] = scripts.main[s]
+            if world.nameAddr:
+                for loc in world.nameAddr:
+                    name = []
+                    for x in range(0, 16):
+                       name.append(romData[loc+x])
+                    warpNames[loc] = name
+        random.shuffle(newWorldOrder)
+        for v in worlds.pillar.values():
+            gWorld = False
+            if newWorldOrder[0].isScript:
+                gWorld = True
+                trigger = [87,0]
+            elif newWorldOrder[0].doorIn > 255:
+                trigger = [newWorldOrder[0].doorIn-256, 6]
+            else:
+                trigger = [newWorldOrder[0].doorIn, 5]
+            maps.map[v.mapPillarID].triggers[v.doorInMapIndex] = trigger
+            maps.map[v.mapPillarID].triggers[v.mapPillarTriggerIndexPrism] = [newWorldOrder[0].prismScript ,0]
+            if v.doorOut > 255:
+                trigger = [v.doorOut - 256, 6]
+            else:
+                trigger = [v.doorOut, 5]
+            maps.map[newWorldOrder[0].mapID].triggers[newWorldOrder[0].doorOutMapIndex] = trigger
+            if gWorld == True:
+                maps.map[90].triggers[0] = trigger
+            if newWorldOrder[0].teleportScripts:
+                for s in newWorldOrder[0].teleportScripts:
+                    scripts.replaceScript(0, 99+scriptIndex, warpScripts[s].hex(" "))
+                    scriptIndex+=1
+            if newWorldOrder[0].nameAddr:
+                for loc in newWorldOrder[0].nameAddr:
+                    for x in range(0,16):
+                        romData[startaddr] = warpNames[loc][x]
+                        startaddr+=1
+            if newWorldOrder[0].scriptTeleportUnlockByte:
+                teleCounter+=newWorldOrder[0].scriptTeleportUnlockByte[2]
+                scripts.main[newWorldOrder[0].scriptTeleportUnlockByte[0]][newWorldOrder[0].scriptTeleportUnlockByte[1]+2] = teleCounter
+        #    prismArray.append(newWorldOrder[0].prismCount)
+            for x in finalStore:
+                if x[0] == newWorldOrder[0].index:
+                    maps.map[x[1]].npcs[x[2]][0] = 0x10
+                    maps.map[x[1]].npcs[x[2]][1] = (v.order*16)+15
+            newWorldOrder.pop(0)
+
+
     # for x in range(0,14):
     #     match x:
     #         case 0:
@@ -329,7 +346,8 @@ if __name__ == "__main__":
     parser.add_argument('-s', '--seed', type=int) # todo - pathlib
     parser.add_argument('-r', '--rom_path', type=str, dest="rom_path")
     parser.add_argument('-e', '--encounter_rate', type=int)
-    parser.add_argument('-g', '--gold_drops', type=int)
+    parser.add_argument('-g', '--gold', type=int)
+    parser.add_argument('-w', '--world', type=int)
     args = parser.parse_args()
-    main(rom_path = args.rom_path, seed=args.seed, encounterRate=args.encounter_rate, goldDrops=args.gold_drops)
+    main(rom_path = args.rom_path, seed=args.seed, encounterRate=args.encounter_rate, goldDrops=args.gold, worldType=args.world)
 

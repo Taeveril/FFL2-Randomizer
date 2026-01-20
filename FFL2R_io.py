@@ -16,11 +16,21 @@ class File:
                 raise Exception("MD5 hash mismatch. Invalid Final Fantasy Legend 2 ROM file.")
         return rom
 
-    def writeOutRom(rom:mmap, seed:int, encounter:int, gold:int):
+    def writeOutRom(rom:mmap, seed:int, encounter:int, gold:int, world:int):
+        mode = ""
+        match world:
+            case 1:
+                mode = "Vanilla"
+            case 2:
+                mode = "Shuffled"
+            case 3:
+                mode = "Open"
         print(f"""        Final Fantasy Legend 2 Randomizer Settings:
             Seed is: {str(seed)}
             Encounter rate adjustment is: {str(encounter)}%
-            Gold adjustment is: {str(gold)}%""")
+            Gold adjustment is: {str(gold)}%
+            World type is: {mode}""")
+            
         with open('Final Fantasy Legend 2 - ' + str(seed) + '.gb', 'xb') as f:
             f.write(rom)
 
