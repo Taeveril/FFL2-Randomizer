@@ -23,19 +23,16 @@
     - Mutant stat growth behaves as expected.
     - Dooring/Pegasus/Teleporting during the race will now force a dismount.
 
-## Version 2.0.0 (1/11/2026):
-- Rewrote entire codebase again, trying to adopt pythonic principles...sort of.
-- Redid Final Shop logic. The NPC will now appear after world completion.
-- Lowered the price of Selfix from 50,000 to 25,000
-- Fixed a bug where the Key in Venus' world was not required to open doors.
-- Fixed a bug where the teleport unlock for Ashura's World would set to an incorrect value.
-- Fixed a bug where using teleport would remove the guest character.
+## Version 2.1.0 (1/19/2026):
+- Added an "open world" option to the randomizer. Generating seeds will now require an input on how worlds should be shuffled (-w).
+- Fixed an issue where teleporting during Guardian Base could break logic and put players in a bad state.
+- Made it so teleporting to Guardian Base will now check where you are in that world's progression.
 
 ## How to:
 - Download the Python scripts (and install Python if you don't have it).
 - Run FFL2R.py
-- Will prompt for a GB ROM, seed, encounter rate.
-  - will also take command line arguments -s for seed, -r for rom path, and -e for encounter rate.
+- Will prompt for a GB ROM, seed, encounter rate, and world mode.
+  - will also take command line arguments -s for seed, -r for rom path, -e for encounter rate, -w for world mode.
 - Will generate a ROM.
 
 ## Credits and thank yous:
