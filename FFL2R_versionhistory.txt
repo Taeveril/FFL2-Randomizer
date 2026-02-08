@@ -1,5 +1,10 @@
 Final Fantasy Legend 2 Randomizer Version History
 
+Version 2.1.1 (2/8/2026):
+	Updated game display to the correct version (2.1)
+	Fixed Prism. Will now give an accurate read on rnamining magi in a given world.
+	Instead of mutants learning weaknesses, they will instead learn Flame/Blizzard/Lightng
+
 Version 2.1.0 (1/19/2026):
 	Added an "open world" option to the randomizer. Generating seeds will now require an input on how worlds should be shuffled (-w).
 	Fixed an issue where teleporting during Guardian Base could break logic and put players in a bad state.
