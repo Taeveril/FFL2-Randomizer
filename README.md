@@ -16,6 +16,7 @@
   - Mr. S will no longer block the first cave entrance upon completion.
   - Better stat growth.
   - NPCs added to help access one-time or limited-time areas.
+  - Mutants no longer learn weaknesses, instead learn elemental AoEs.
   - Game bug fixes:
     - Gold/Meat/Item drops now calculate correctly.
     - Elemental MAGI behaves appropriately.
@@ -23,10 +24,10 @@
     - Mutant stat growth behaves as expected.
     - Dooring/Pegasus/Teleporting during the race will now force a dismount.
 
-## Version 2.1.0 (1/19/2026):
-- Added an "open world" option to the randomizer. Generating seeds will now require an input on how worlds should be shuffled (-w).
-- Fixed an issue where teleporting during Guardian Base could break logic and put players in a bad state.
-- Made it so teleporting to Guardian Base will now check where you are in that world's progression.
+## Version 2.1.1 (2/8/2026):
+- Updated game display to the correct version (2.1)
+- Fixed Prism. Will now give an accurate read on rnamining magi in a given world.
+- Instead of mutants learning weaknesses, they will instead learn Flame/Blizzard/Lightng
 
 ## How to:
 - Download the Python scripts (and install Python if you don't have it).
