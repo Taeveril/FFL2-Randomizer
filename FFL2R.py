@@ -18,8 +18,8 @@ from FFL2R_manager_economy import GoldManager
 from FFL2R_manager_economy import ItemManager
 from FFL2R_manager_world import WorldManager
 
-VERSION = 2.0
-
+VERSION = 2.1
+DEBUG = False
 
 def main(rom_path:str|None, seed:int|None, encounterRate:int|None, goldDrops:int|None, worldType:int|None):
     Tk().withdraw()
@@ -51,10 +51,9 @@ def main(rom_path:str|None, seed:int|None, encounterRate:int|None, goldDrops:int
     if worldType < 1 or worldType > 3:
         raise Exception("Invalid World Order Selection.")
 
-
     treasureFlagReclaim = []
 
-    romData = File.readInRom(gameFile)
+    romData = File.readInRom(gameFile, DEBUG)
 
     FFL2R_asm.Fixes.missingTrigger(romData)
     FFL2R_asm.Fixes.magiFix(romData)
@@ -85,11 +84,12 @@ def main(rom_path:str|None, seed:int|None, encounterRate:int|None, goldDrops:int
     FFL2R_manager_base.GamePrep.dadDeathCutscenes(scripts)
     FFL2R_manager_base.GamePrep.warMachAdjust(scripts, maps, treasureFlagReclaim)
     FFL2R_manager_base.GamePrep.nastyChest(scripts, maps)
-    FFL2R_manager_base.GamePrep.prismDummy(scripts)
     FFL2R_manager_base.GamePrep.guardianBaseLogic(maps)
+    FFL2R_manager_base.GamePrep.betterPrism(scripts, romData)
     FFL2R_manager_base.GamePrep.newCredits(scripts)
 
     FFL2R_manager_base.ScriptedQOL.newNPCHelpers(scripts, maps)
+
 
     magiShuffle(scripts, maps, GameData.MAGI)
     treasureShuffle(maps, scripts, GameData.TREASURES, treasureFlagReclaim)
@@ -110,7 +110,7 @@ def main(rom_path:str|None, seed:int|None, encounterRate:int|None, goldDrops:int
     
     for k,v in GameData.newItemPrices.items():
          items.item[k].setPrice(v)
-
+    
     romData = File.editRom(romData, scripts, maps, shops, monsters, gold, items)
 
     File.writeOutRom(romData, gameSeed, encounterRate, goldDrops, worldType)
@@ -258,8 +258,6 @@ def worldShuffle(romData:mmap, maps:MapManager, scripts:ScriptManager, worlds:Wo
     startaddr = worlds.WORLD_NAME_STARTADDR
     warpNames = {}
     scriptIndex = 0
-    #prismArray = []
-    #prismLoc = 0x3e600
     teleCounter = 2
     finalStore = list(worlds.finalStore.values())
     worlds.magiCheckRedo(scripts, maps, worldType)
@@ -319,27 +317,11 @@ def worldShuffle(romData:mmap, maps:MapManager, scripts:ScriptManager, worlds:Wo
             if newWorldOrder[0].scriptTeleportUnlockByte:
                 teleCounter+=newWorldOrder[0].scriptTeleportUnlockByte[2]
                 scripts.main[newWorldOrder[0].scriptTeleportUnlockByte[0]][newWorldOrder[0].scriptTeleportUnlockByte[1]+2] = teleCounter
-        #    prismArray.append(newWorldOrder[0].prismCount)
             for x in finalStore:
                 if x[0] == newWorldOrder[0].index:
                     maps.map[x[1]].npcs[x[2]][0] = 0x10
                     maps.map[x[1]].npcs[x[2]][1] = (v.order*16)+15
             newWorldOrder.pop(0)
-
-
-    # for x in range(0,14):
-    #     match x:
-    #         case 0:
-    #             romData[prismLoc] = 7
-    #         case 2:
-    #             romData[prismLoc + 2] = romData[prismLoc + 1] + 1
-    #         case 4:
-    #             romData[prismLoc + 4] = romData[prismLoc + 3] + 7
-    #         case 8:
-    #             romData[prismLoc + 8] = romData[prismLoc + 7] + 1
-    #         case _:
-    #             romData[prismLoc + x] = romData[prismLoc + x - 1] + prismArray[0]
-    #             prismArray.pop(0)      
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

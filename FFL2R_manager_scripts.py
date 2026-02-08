@@ -74,10 +74,3 @@ class ScriptManager:
 
     def removeFromScript(self, bank:int, scriptId:int, positionStart:int, positionEnd:int):
         del self.banks[bank][scriptId][positionStart:positionEnd]
-
-
-
-
-                    
-                    
-

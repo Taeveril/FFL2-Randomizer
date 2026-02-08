@@ -98,6 +98,7 @@ class WorldManager():
         scripts.replaceScript(0, 75, '00')
         scripts.replaceScript(0, 76, '00')
         scripts.replaceScript(0, 77, '00')
+        scripts.removeFromScript(0, 142, 307, 310)
  
         for v in self.pillar.values():
             if (v.nextPillarVar16Check):

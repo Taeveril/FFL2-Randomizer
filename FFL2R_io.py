@@ -8,11 +8,11 @@ class File:
     def __init__(self):
         pass
 
-    def readInRom(file:str)->mmap:
+    def readInRom(file:str, DEBUG:bool)->mmap:
         with open(file, 'rb') as f:
             rom = mmap.mmap(f.fileno(), length=0, access=mmap.ACCESS_COPY,offset=0)
             hashCheck = hashlib.md5(rom)
-            if hashCheck.hexdigest() != FFL2_HASH:
+            if hashCheck.hexdigest() != FFL2_HASH and not DEBUG:
                 raise Exception("MD5 hash mismatch. Invalid Final Fantasy Legend 2 ROM file.")
         return rom
 

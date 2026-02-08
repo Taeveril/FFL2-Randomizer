@@ -326,8 +326,31 @@ class GamePrep:
         maps.addNPC(187, 0, '11 11 4c cc 03 f1')
         scripts.replaceScript(0, 71, '12 0c 12 11 10 13 11 19 0a 0b 00')
 
-    def prismDummy(scripts:ScriptManager):
-        scripts.replaceScript(2, 64, '09 0d 02 02 f2 f2 00')
+    def betterPrism(scripts:ScriptManager, rom:mmap):
+        def _iterate(addr:int, code:bytearray):
+            for x in range (0, len(code)):
+                rom[addr+x] = code[x]
+
+        magiTrackCode = bytearray.fromhex("""E5 D5 21 55 C3 16 00 1E 0E CD 92 01 5F 19 34 D1 E1 C9 C3 AB 3C 21 B9 C2 06 10 7E 3C C8 23 23 05 20 F8 B7 C9 
+                                             3E 18 E0 B2 06 03 F0 47 EE FF E0 47 E0 48 E0 49 0E 04 CD 7F 2F D7 CD 97 1A 0D 20 F6 F0 47 EE FF E0 47 E0 48 
+                                             E0 49 0E 06 CD 7F 2F D7 CD 97 1A 0D 20 F6 05 20 D1 C3 93 3C 21 DA C2 06 1C AF 22 05 20 FC AF EA D9 C2 C3 93 
+                                             3C 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00""")
+        shift = (0x3ee0, 0x3f29)
+        prismJump = bytearray.fromhex('C3 89 5D')
+        prismTracking = bytearray.fromhex('C5 D5 47 21 55 C3 16 00 1E 0E CD 92 01 5F 19 78 D1 C1 C3 00 5D 00 00 00 00 00 00')
+        _iterate(0x3f75, magiTrackCode)
+        for x in shift:
+            rom[x] = 0x8a
+        rom[0x3adc] = 0x99
+        rom[0x3af5] = 0xd1
+        _iterate(0x5cfd, prismJump)
+        _iterate(0x5d89, prismTracking)
+
+        previous = 0x00
+        for x in range (0x3e600, 0x3e60f):
+            current = rom[x]
+            rom[x]-=previous
+            previous = current
 
     def newCredits(scripts:ScriptManager):
         scripts.replaceScript(3, 240, """46 19 07 0f 4a 20 1f 05 f5 bd d4 d7 f3 f3 06 bf 60 51 e5 f5 c3 59 d8 77 06 ff e9 e2 dc d6 4e 5d df 57 6c 4f e2

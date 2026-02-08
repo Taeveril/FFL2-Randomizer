@@ -65,6 +65,3 @@ class MonsterManager:
             Gold Index:     {self.goldIndex}
             """
             )
-
-
-

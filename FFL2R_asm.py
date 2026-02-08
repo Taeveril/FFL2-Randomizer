@@ -94,15 +94,14 @@ class QOL:
             for i in range(len(v)):
                 rom[k+i] = v[i]
 
+        #ditch mutant weaknesses, replace with AoEs
+        rom[0x33fd9] = 0xb8
+        rom[0x33fdb] = 0xba
+        rom[0x33fdc] = 0xbb
+
         #this doubles or triples growth chances
         for i in range(0,32):
             if i == 16 or i == 17:
                 rom[0x33f90+i]*=2
             else:
                 rom[0x33f90+i]*=3
-       
-
-
-
-
-

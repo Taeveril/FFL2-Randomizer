@@ -49,3 +49,6 @@ and often times players might not be aware of the changes. The purpose of this t
   
 - As of ver 2.0 the Celesial Palace shaking currently does not work, probably due to an effort to free up var 29. This may be fixed eventually,
   but it is considered extremely low priority.
+
+- To make room in a rom bank, the command to restore all magi to the player after Apollo's defeat has been removed. You immediately lose the
+  magi to make Isis, so this was ultimately considered worth cutting.
