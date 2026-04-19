@@ -2,7 +2,6 @@ import mmap
 from FFL2R_manager_scripts import ScriptManager
 from FFL2R_manager_maps import MapManager
 from FFL2R_data import GameData
-from FFL2R import VERSION
 
 class ScriptedFixes:
     def __init__(self):
@@ -90,7 +89,7 @@ class GamePrep:
     def __init__(self):
         pass
 
-    def newTitleScreen(scripts:ScriptManager, seed:int):
+    def newTitleScreen(scripts:ScriptManager, seed:int, VERSION:float):
         def _infoPatchList(seed:int)->str:
             def _hexList(info:str, maxLength:int)->str:
                 hexes = ''
@@ -259,12 +258,12 @@ class GamePrep:
                                                  01 30 00 15 01 02 19 01 2f 00 00""")
         scripts.insertIntoScript(0, 308, 0, '12 0c')
  
-    def convertToRealChests(scripts:ScriptManager, maps:MapManager, treasureFlags:list):
+    def convertTrueEyeChest(scripts:ScriptManager, maps:MapManager):
         scripts.replaceScript(0, 38, """1b 0a 19 00 5b 00 19 05 b4 19 07 0e c2 e7 77 4f e2 5b d5 e5 dc da db e7 f3 06 79 97 e1 88 54 80 d8 06 59 
                                                 ec 50 56 da f3 f3 00""")
         scripts.replaceScript(0, 91, '19 05 b5 19 f0 12 19 07 0b 36 03 cc d8 4e ea d8 67 5e 87 db 06 36 03 9e ff cd e5 e8 4e be ec 4e f3 f3 00')
-        maps.map[65].npcs[2] = bytearray.fromhex('80' + f"{treasureFlags[0]:02x}" + '20 d9 0a fa')
-        treasureFlags.pop(0)
+        #0x15 not used?
+        maps.map[65].npcs[2] = bytearray.fromhex('80 15 20 d9 0a fa')
         scripts.replaceScript(0, 86, '00')
 
     def venusWorldCleanup(scripts:ScriptManager, maps:MapManager):

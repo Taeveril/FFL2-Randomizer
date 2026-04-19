@@ -1,5 +1,9 @@
 Final Fantasy Legend 2 Randomizer Version History
 
+Version 3.0.0 (4/19/2026):
+	Website now available for ROM generation: https://www.ffl2r.com/
+	Fixed a bug where shuffling worlds would also set the game as open world. 
+
 Version 2.1.1 (2/8/2026):
 	Updated game display to the correct version (2.1)
 	Fixed Prism. Will now give an accurate read on rnamining magi in a given world.

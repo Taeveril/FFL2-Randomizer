@@ -1,5 +1,5 @@
 FFLegend 2 Randomizer Game Behavior Changelog:
-Last updated - 01/11/2026
+Last updated - 04/19/2026
 
 Game behavior here is defined as player expectation from previously playing Final Fantasy Legend 2. Due to the nature of wanting to accomplish 
 various goals in the randomizer, altering game behavior becomes forced. However, most of the game behavior has been retained as much as possible, 
@@ -52,3 +52,6 @@ and often times players might not be aware of the changes. The purpose of this t
 
 - To make room in a rom bank, the command to restore all magi to the player after Apollo's defeat has been removed. You immediately lose the
   magi to make Isis, so this was ultimately considered worth cutting.
+  
+- The final shop, the shop that appears in every world that sells Doors to prevent players from getting stuck after Apollo steals your MAGI, 
+  now sells magic-based cures and stat boosters, and potentially a high tier item. The shop appears once the world has been completed.

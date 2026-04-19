@@ -102,7 +102,7 @@ class WorldManager():
  
         for v in self.pillar.values():
             if (v.nextPillarVar16Check):
-                if worldType != 2:
+                if worldType != 3:
                     maps.map[v.mapPillarID].npcs[0][1] = v.nextPillarVar16Check
                 else:
                     maps.map[v.mapPillarID].npcs[0][1] = 0x00

@@ -2,9 +2,6 @@ import random
 import argparse
 import mmap
 
-from tkinter import Tk
-from tkinter.filedialog import askopenfilename
-
 import FFL2R_asm
 import FFL2R_manager_base
 from FFL2R_utils import Utility
@@ -18,19 +15,22 @@ from FFL2R_manager_economy import GoldManager
 from FFL2R_manager_economy import ItemManager
 from FFL2R_manager_world import WorldManager
 
-VERSION = 2.1
+VERSION = 3.0
 DEBUG = False
 
-def main(rom_path:str|None, seed:int|None, encounterRate:int|None, goldDrops:int|None, worldType:int|None):
-    Tk().withdraw()
-    if not rom_path:
-        gameFile = askopenfilename(title="First, please point to the FFL2 rom.")
-    else:
-        gameFile = rom_path
+def main(fromWeb:bool, romData:mmap.mmap|None, rom_path:str|None, seed:int|None, encounterRate:int|None, goldDrops:int|None, 
+         worldType:int|None)->tuple:
+    if not fromWeb:
+        if not rom_path:
+            gameFile = str(input("First, please path to the FFL2 rom. \n>>"))
+        else:
+            gameFile = rom_path
+        romData = File.readInRom(gameFile, DEBUG)
 
     #  seeding
     if not seed:
-        gameSeed_str = str(input("Seed please. Blank will generate a random number. \n>>"))
+        if not fromWeb:
+            gameSeed_str = str(input("Seed please. Blank will generate a random number. \n>>"))
         try:
             gameSeed = int(gameSeed_str)
             gameSeed = abs(gameSeed)
@@ -48,13 +48,11 @@ def main(rom_path:str|None, seed:int|None, encounterRate:int|None, goldDrops:int
 
     if not worldType:
         worldType = int(input("Choose a world order type: 1 = Vanilla, 2 = Shuffle, 3 = Open\n>>"))
+        
     if worldType < 1 or worldType > 3:
         raise Exception("Invalid World Order Selection.")
 
     treasureFlagReclaim = []
-
-    romData = File.readInRom(gameFile, DEBUG)
-
     FFL2R_asm.Fixes.missingTrigger(romData)
     FFL2R_asm.Fixes.magiFix(romData)
     FFL2R_asm.Fixes.mutantStr(romData)
@@ -73,10 +71,16 @@ def main(rom_path:str|None, seed:int|None, encounterRate:int|None, goldDrops:int
     items = ItemManager(romData)
     worlds = WorldManager()
 
+    #print(scripts.main[193].hex(" "))
+
+    # print(f"item: {scripts.findScriptByBytes('19 09')}")
+    # print(f"magi: {scripts.findScriptByBytes('19 0a')}")
+    # print(f"item-force: {scripts.findScriptByBytes('19 0b')}")
+
     FFL2R_manager_base.ScriptedFixes.moveMrS(scripts, maps)
     FFL2R_manager_base.ScriptedFixes.fixTheRace(scripts, maps)
 
-    FFL2R_manager_base.GamePrep.newTitleScreen(scripts, gameSeed)
+    FFL2R_manager_base.GamePrep.newTitleScreen(scripts, gameSeed, VERSION)
     FFL2R_manager_base.GamePrep.newDropScripts(scripts)
     FFL2R_manager_base.GamePrep.kiShrineCleanup(scripts, maps)
     FFL2R_manager_base.GamePrep.memoRemove(scripts, romData)
@@ -90,13 +94,12 @@ def main(rom_path:str|None, seed:int|None, encounterRate:int|None, goldDrops:int
 
     FFL2R_manager_base.ScriptedQOL.newNPCHelpers(scripts, maps)
 
-
     magiShuffle(scripts, maps, GameData.MAGI)
     treasureShuffle(maps, scripts, GameData.TREASURES, treasureFlagReclaim)
     shopRando(shops, GameData.shopTiers)
     worldShuffle(romData, maps, scripts, worlds, worldType)
 
-    FFL2R_manager_base.GamePrep.convertToRealChests(scripts, maps, treasureFlagReclaim)
+    FFL2R_manager_base.GamePrep.convertTrueEyeChest(scripts, maps)
 
     newStarters(monsters, scripts)
 
@@ -113,8 +116,25 @@ def main(rom_path:str|None, seed:int|None, encounterRate:int|None, goldDrops:int
     
     romData = File.editRom(romData, scripts, maps, shops, monsters, gold, items)
 
-    File.writeOutRom(romData, gameSeed, encounterRate, goldDrops, worldType)
-    print("            Randomizer finished successfully. Right on!")
+    mode = ""
+    match worldType:
+        case 1:
+            mode = "Vanilla"
+        case 2:
+            mode = "Shuffled"
+        case 3:
+            mode = "Open"
+    print(f"""        Final Fantasy Legend 2 Randomizer Settings:
+        Seed is: {str(gameSeed)}
+        Encounter rate adjustment is: {str(encounterRate)}%
+        Gold adjustment is: {str(goldDrops)}%
+        World type is: {mode}""")
+    if fromWeb == True:
+        return romData, gameSeed
+    else:
+        File.writeOutRom(romData, gameSeed)
+        print("            Randomizer finished successfully. Right on!")
+        return 0
 
 
 def goldAdjustment(gold:GoldManager, rate:int):
@@ -331,5 +351,4 @@ if __name__ == "__main__":
     parser.add_argument('-g', '--gold', type=int)
     parser.add_argument('-w', '--world', type=int)
     args = parser.parse_args()
-    main(rom_path = args.rom_path, seed=args.seed, encounterRate=args.encounter_rate, goldDrops=args.gold, worldType=args.world)
-
+    main(False, None, rom_path = args.rom_path, seed=args.seed, encounterRate=args.encounter_rate, goldDrops=args.gold, worldType=args.world)
