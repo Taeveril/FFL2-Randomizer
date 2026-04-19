@@ -34,6 +34,7 @@
 - Will prompt for a GB ROM, seed, encounter rate, and world mode.
   - will also take command line arguments -s for seed, -r for rom path, -e for encounter rate, -w for world mode.
 - Will generate a ROM.
+- Alternatively, you can now visit the website: https://www.ffl2r.com/
 
 ## Credits and thank yous:
 This project really stands on the shoulders of giants. Over two decades of people poking and
