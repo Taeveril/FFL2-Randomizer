@@ -24,10 +24,9 @@
     - Mutant stat growth behaves as expected.
     - Dooring/Pegasus/Teleporting during the race will now force a dismount.
 
-## Version 2.1.1 (2/8/2026):
-- Updated game display to the correct version (2.1)
-- Fixed Prism. Will now give an accurate read on rnamining magi in a given world.
-- Instead of mutants learning weaknesses, they will instead learn Flame/Blizzard/Lightng
+## Version 3.0.0 (2/8/2026):
+- Website now available for ROM generation: https://www.ffl2r.com/
+- Fixed a bug where shuffling worlds would also set the game as open world. 
 
 ## How to:
 - Download the Python scripts (and install Python if you don't have it).
