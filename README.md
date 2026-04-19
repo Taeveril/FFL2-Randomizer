@@ -24,7 +24,7 @@
     - Mutant stat growth behaves as expected.
     - Dooring/Pegasus/Teleporting during the race will now force a dismount.
 
-## Version 3.0.0 (2/8/2026):
+## Version 3.0.0 (4/19/2026):
 - Website now available for ROM generation: https://www.ffl2r.com/
 - Fixed a bug where shuffling worlds would also set the game as open world. 
 
