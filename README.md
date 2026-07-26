@@ -25,7 +25,7 @@
     - Mutant stat growth behaves as expected.
     - Dooring/Pegasus/Teleporting during the race will now force a dismount.
 
-## Version 3.2.2 (6/14/2026):
+## Version 3.2.2 (7/25/2026):
 - Fixed poison glitch.
 
 ## Version 3.2.0 (6/14/2026):
