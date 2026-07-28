@@ -8,6 +8,11 @@ class Fixes:
     def missingTrigger(rom:mmap):
         rom[0x1e292] = 0x09
 
+    # Fixes poison glitch by pointing the poison death message call to one specifically for when the attacker falls.
+    def fixPoison(rom:mmap):
+        rom[0x30c19] = 0x7b
+        rom[0x30c1a] = 0x6c
+
     #elemental magi fix, mana magi affinity enable
     def magiFix(rom:mmap):
         adjustments = {
