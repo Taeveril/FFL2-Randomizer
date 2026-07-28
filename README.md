@@ -19,6 +19,7 @@
   - Mutants no longer learn weaknesses, instead learn elemental AoEs.
   - Can choose with MAGI Dad gives you during the opening cutscene.
   - Game bug fixes:
+    - Enemy death-by-poison now behaves correctly.
     - Gold/Meat/Item drops now calculate correctly.
     - Elemental MAGI behaves appropriately.
     - Mana MAGI affinity enabled.
