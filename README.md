@@ -5,7 +5,7 @@
 - Magi shuffle/rando.
 - Shop rando.
 - Starting monsters rando.
-- World shuffle.
+- World shuffle via "key" items.
 - QoL Features:
   - Empty chests will appear open.
   - Encounter rate adjustment.
@@ -26,11 +26,9 @@
     - Mutant stat growth behaves as expected.
     - Dooring/Pegasus/Teleporting during the race will now force a dismount.
 
-## Version 3.2.2 (7/25/2026):
-- Fixed poison glitch.
-
-## Version 3.2.0 (6/14/2026):
-- Added functionality to be able to choose MAGI at the start.
+## Version 3.3.0 (7/25/2026):
+- World Shuffle has been reworked to use "key" items that unblock progression.
+- Final Store will now always appear after clearing a world.
 
 ## How to:
 - Download the Python scripts (and install Python if you don't have it).
