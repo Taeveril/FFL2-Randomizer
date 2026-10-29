@@ -110,3 +110,4 @@ class QOL:
                 rom[0x33f90+i]*=2
             else:
                 rom[0x33f90+i]*=3
+

@@ -1,5 +1,13 @@
 Final Fantasy Legend 2 Randomizer Version History
 
+Version 3.3.0 (10/29/2026):
+	World Shuffle has been reworked to use "key" items that unblock progression.
+	Fixed poison glitch.
+	Final Store will now always arrear after clearing a world.
+
+Version 3.2.2 (7/25/2026):
+	Added functionality to be able to choose MAGI at the start.
+
 Version 3.2.0 (6/14/2026):
 	Added functionality to be able to choose MAGI at the start.
 

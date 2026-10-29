@@ -24,7 +24,7 @@ class ScriptedFixes:
                                      00 f6 53 01 f6 53 02 ff 0d 13 11 10 c8 e2 e2 e2 e3 e6 f3 06 bf d8 67 58 74 87 74 d8 70 7c f3 11 10 0d 19 07 0b 14 18 0a
                                      15 19 00 14 19 01 31 00""")
         scripts.replaceScript(0, 80, """15 1f 00 19 01 db 00 19 f1 30 ff 19 07 03 c0 c8 ba c5 f3 f3 06 99 4e ea 56 92 68 5f 06 20 1f 00 77 ff cd 75 e0 f3 0b 0d 
-                                     19 f0 05 bc 65 da 82 e7 e8 df 60 dc 65 e6 f3 0b 0d 14 12 00 14 19 06 19 06 3a 19 07 0c 12 10 00""")
+                                     19 f0 05 bc 65 da 82 e7 e8 df 60 dc 65 e6 f3 0b 0d 14 12 00 14 19 06 19 06 3a 19 07 0c 00""")
         scripts.replaceScript(0, 95, '15 11 02 19 00 5d 31 14 0f 03 19 f0 10 19 07 8b 19 07 0c 00')
         scripts.replaceScript(0, 449, '4b 55 f3 00')
         scripts.replaceScript(0, 457, """15 1f 00 19 01 db 00 15 19 2f 19 06 37 00 15 1f 2f 19 06 37 00 12 11 10 11 10 09 06 13 11 12 12 14 19 02 10 19 0a 01 0d 
@@ -38,6 +38,7 @@ class ScriptedFixes:
         scripts.replaceScript(0, 461, '19 01 ed 15 1f 3f 19 01 ee 00 00')
         scripts.replaceScript(0, 462, '19 01 ed 15 1f 4f 19 01 ee 00 00')
         scripts.replaceScript(0, 463, '00')
+        scripts.removeFromScript(0, 381, 58, 60)
         maps.map[129].npcs[1] = bytearray.fromhex('19 6f 05 8a 8f a1')
         maps.map[129].npcs[2] = bytearray.fromhex('19 01 05 8a c2 a1')
         maps.map[129].npcs[4] = bytearray.fromhex('19 6f 0d 8a 8f b1')
@@ -71,12 +72,12 @@ class ScriptedQOL:
         maps.addNPC(1, 66, '01 DF 1F 05 C3 A0')
         scripts.addNewScript(0, 'bd 5b 6d 9a 92 8f 4f 5b da 85 63 81 85 70 6b 69 86 69 d9 ff ba 93 7d d4 77 ff bb 89 d8 f4 16 19 05 33 31 0d 00')
         scripts.removeFromScript(0, 25, 0, 6)
-        scripts.insertIntoScript(0, 25, 0, '12 10 15 01 bf 19 05 3f 00')
+        scripts.insertIntoScript(0, 25, 0, '15 01 bf 19 05 3f 00')
         #Ki's Body Guardian
         scripts.addNewScript(0, """79 6a 76 63 81 4e d8 eb e7 82 ff 22 ff 78 51 5a 5c d9 ff 06 6d 9a 92 8f 4f 5b da 85 06 d5 d4 d6 de 5c 94 5b c4 
                                    dc 77 06 bb e2 d7 ec 16 19 01 24 31 0d 00""")
         maps.map[11].npcgfx[3] = 0x3c
-        maps.map[11].npcs[8] = bytearray.fromhex('03 5f 11 0c c4 c0')
+        maps.map[11].npcs[8] = bytearray.fromhex('03 5e 11 0c c4 c0')
         scripts.replaceScript(0, 299, '00')
         scripts.replaceScript(0, 300, '00')
         #Valhalla teleporters
@@ -171,6 +172,9 @@ class GamePrep:
             scripts.replaceScript(3, x, '00')
         for x in GameData.memoSets:
             scripts.removeFromScript(0, x[0], x[1], x[1]+2)
+        #adding more room to the first scripting bank by moving one of Hana's cutscenes to Memo.
+        scripts.replaceScript(3, 245, scripts.main[117].hex(" "))
+        scripts.replaceScript(0, 117, '4b f5 00')
 
     def kiShrineCleanup(scripts:ScriptManager, maps:MapManager):
         scripts.addNewScript(0, 'ba e6 e6 5f e7 59 e7 f5 8c 61 d4 76 06 e6 81 85 70 6b 7e 66 6f 55 f3 00')
@@ -178,7 +182,7 @@ class GamePrep:
         maps.delNPC(11, 7)
         maps.map[11].npcs = [bytearray.fromhex('00 0e 24 25 25 11'), bytearray.fromhex('00 0e 28 25 27 21'), bytearray.fromhex('00 0e 24 a2 29 31'), 
                              bytearray.fromhex('01 0c 14 13 2d 51'), bytearray.fromhex('01 de 13 0c 2e d1'), bytearray.fromhex('01 06 12 cc 38 e1'), 
-                             bytearray.fromhex('01 de 52 cc 32 e1'), bytearray.fromhex('03 5f 12 cc 33 e1'), bytearray.fromhex('01 0e 10 11 2b 41'), 
+                             bytearray.fromhex('01 de 52 cc 32 e1'), bytearray.fromhex('03 5e 12 cc 33 e1'), bytearray.fromhex('01 0e 10 11 2b 41'), 
                              bytearray.fromhex('ff')]
         scripts.insertIntoScript(0, 293, 0, '15 01 de 19 01 26 00')
         scripts.insertIntoScript(0, 295, 0, '15 01 de 19 01 28 00')
@@ -193,7 +197,7 @@ class GamePrep:
         scripts.insertIntoScript(0, 34, 5, '12 0c')
         scripts.insertIntoScript(0, 35, 5, '12 0c')
         scripts.insertIntoScript(0, 36, 5, '12 0c')
-        scripts.replaceScript(0, 37, '19 0a 03 12 03 12 0c 12 10 14 01 0f 10 14 0c 00 0b 0d 19 05 b0 19 07 03 00')
+        scripts.replaceScript(0, 37, '19 0a 03 12 03 12 0c 14 01 0f 10 14 0c 00 0b 0d 19 05 b0 19 07 03 00')
         scripts.main[345][37] = 0x0c
         maps.map[54].npcs = [bytearray.fromhex('4c 77 1a 12 59 91'), bytearray.fromhex('0c 78 5a cf 25 a0'), bytearray.fromhex('ff')]
         maps.map[22].npcs[0][1] = 0x55
@@ -212,7 +216,7 @@ class GamePrep:
                                          f1 5e 59 e1 7b f1 83 dc d8 f1 ff f1 11 30 ba cb cb c0 c1 f3 11 01 0d 14 02 05 10 19 00 c0 0d 19 05 4a 10 19 f1 03 
                                          ff 1f 04 f5 c2 ee 76 83 65 d8 06 5e 6a 54 79 ea 59 7f 57 5d f0 06 ff cc d8 4e 6d e8 f3 06 06 36 03 1f 04 8a d8 d9 
                                          e7 f0 0b 0d 14 02 06 14 00 00 10 19 f1 00 ff 20 1f 05 f5 c4 dc 64 8e 54 95 06 5c 73 7b e7 91 e8 d5 98 f3 06 ff c5 
-                                         85 77 62 5b 5d 61 53 f3 0b 0d 12 10 00""")
+                                         85 77 62 5b 5d 61 53 f3 0b 0d 00""")
         maps.map[41].npcs[4] = bytearray.fromhex('03 00 5f 8b 53 d1')
         scripts.replaceScript(0, 339, """46 20 1f 05 f5 bd f1 ff bd d4 d7 f3 f3 06 19 07 0a bf 60 51 e5 f5 ce db f4 ff 20 1f 05 ff f1 f4 06 20 1f 05 f5 d2 
                                          75 db f3 f3 06 ff cb d8 6c e0 95 68 6c f4 f3 06 bf 60 51 e5 f5 c8 d9 7a 55 e5 80 f3 06 ff f1 ff c8 db ef ff 20 1f 
@@ -255,13 +259,16 @@ class GamePrep:
                                                  01 30 00 15 01 02 19 01 2f 00 00""")
         scripts.insertIntoScript(0, 308, 0, '12 0c')
  
-    def convertTrueEyeChest(scripts:ScriptManager, maps:MapManager):
+    def reuseVar5(scripts:ScriptManager, maps:MapManager):
         scripts.replaceScript(0, 38, """1b 0a 19 00 5b 00 19 05 b4 19 07 0e c2 e7 77 4f e2 5b d5 e5 dc da db e7 f3 06 79 97 e1 88 54 80 d8 06 59 
                                                 ec 50 56 da f3 f3 00""")
         scripts.replaceScript(0, 91, '19 05 b5 19 f0 12 19 07 0b 36 03 cc d8 4e ea d8 67 5e 87 db 06 36 03 9e ff cd e5 e8 4e be ec 4e f3 f3 00')
         #0x15 not used?
         maps.map[65].npcs[2] = bytearray.fromhex('80 26 20 d9 0a fa')
-        scripts.replaceScript(0, 86, '00')
+        scripts.insertIntoScriptAtEnd(0, 492, '12 05 15 05 44 19 00 56 00')
+        scripts.insertIntoScriptAtEnd(0, 89, '15 05 12 12 05 12 05 15 05 44 19 00 56 00')
+        scripts.insertIntoScriptAtEnd(0, 350, '12 05')
+        scripts.replaceScript(0, 86, '12 05 00')
 
     def venusWorldCleanup(scripts:ScriptManager, maps:MapManager):
         scripts.insertIntoScript(0, 165, 0, '15 08 01 14 08 02 31')
@@ -273,7 +280,7 @@ class GamePrep:
         scripts.insertIntoScript(0, 413, 6, '00 15 08 11 19 01 f6 00')
         scripts.removeFromScript(3, 241, 390, 392)
         scripts.insertIntoScript(3, 241, 390, '15 11 00')
-        scripts.insertIntoScript(3, 241, 504, '13 11 12 10')
+        scripts.insertIntoScript(3, 241, 504, '13 11')
         scripts.insertIntoScript(0, 420, 0, '12 11')
         scripts.removeFromScript(0, 415, 51, 53)
         scripts.insertIntoScript(0, 415, 51, '15 11 00')
@@ -324,14 +331,11 @@ class GamePrep:
                                          e2 54 9d 78 5c 73 50 d8 06 64 5f e6 dc 65 58 52 d4 06 ff 20 21 ff ea ef ff bc d4 e3 e7 d4 56 
                                          06 4f 5a 60 8f ff c5 ec e1 73 89 06 58 ff 5a d4 96 d7 d4 e8 da db 7f e5 f0 06 ff f1 f1 79 6a 
                                          76 4f 5b da dc 76 06 4f 70 52 d5 d4 d6 de 4f 5b 6d e8 f0 ff bc d4 e3 e7 d4 56 8a d8 d9 54 87 
-                                         06 61 53 d8 f0 0b 0d 19 0a 01 14 07 07 14 0e 07 12 10 19 05 ed 0d 15 05 00 14 04 00 00 15 05 
-                                         11 14 04 01 00 15 05 33 14 04 01 00 00 00 06""")
+                                         06 61 53 d8 f0 0b 0d 19 0a 01 14 07 07 14 0e 07 19 05 ed 0d 15 05 00 14 04 00 00 15 05
+                                         11 14 04 01 00 15 05 33 14 04 01 00 00""")
         scripts.replaceScript(0, 371, '00')
         scripts.replaceScript(0, 372, '00')
         scripts.replaceScript(0, 408, '4b f4 40 f4 00')
-        scripts.insertIntoScriptAtEnd(0, 492, '12 05 15 05 44 12 10 12 05 00')
-        scripts.insertIntoScriptAtEnd(0, 89, '15 05 12 12 05 12 05 15 05 44 12 10 12 05 00')
-        scripts.insertIntoScriptAtEnd(0, 350, '12 05')
 
     def guardianBaseLogic(maps:MapManager):
             maps.map[90].npcs[0][1] = 0x77
@@ -418,3 +422,15 @@ class GamePrep:
                                          56 da f3 06 ff cd d4 de 4e 6c 5e 87 db 6f 55 f3 bd d4 d7 f5 bd 75 e5 f1 f3 f4 06 20 1f 05 f5 c0 5a 60 f3 06 ff 
                                          c5 85 77 62 e2 f3 11 10 0d 19 f6 11 02 f3 11 f6 13 03 ff 19 f6 61 02 f3 61 f6 61 03 ff 19 f0 15 11 70 19 0e 09 
                                          11 30 4d 00""")
+
+    #adding new key and ap item icons
+    def addgfx(rom:mmap):
+
+        gfx = {
+            0x109c0 : bytearray.fromhex('FF 1C E3 3E DD 61 C1 79 F7 3C F3 1A F7 1C F3 1A'), #key
+            0x109d0 : bytearray.fromhex('E7 00 C1 64 00 18 7E E7 BD A5 00 24 81 66 E7 00') #ap item
+            }
+
+        for k,v in gfx.items():
+            for i in range(len(v)):
+                rom[k+i] = v[i]

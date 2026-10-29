@@ -15,7 +15,7 @@ from FFL2R_manager_economy import GoldManager
 from FFL2R_manager_economy import ItemManager
 from FFL2R_manager_world import WorldManager
 
-VERSION = 3.22
+VERSION = 3.3
 DEBUG = False
 
 def main(fromWeb:bool, romData:mmap.mmap|None, rom_path:str|None, seed:int|None, encounterRate:int|None, goldDrops:int|None, 
@@ -123,7 +123,9 @@ def main(fromWeb:bool, romData:mmap.mmap|None, rom_path:str|None, seed:int|None,
     FFL2R_manager_base.GamePrep.guardianBaseLogic(maps)
     FFL2R_manager_base.GamePrep.betterPrism(scripts, romData)
     FFL2R_manager_base.GamePrep.newCredits(scripts)
-    FFL2R_manager_base.GamePrep.convertTrueEyeChest(scripts, maps)
+    FFL2R_manager_base.GamePrep.reuseVar5(scripts, maps)
+    FFL2R_manager_base.GamePrep.addgfx(romData)
+
 
     FFL2R_manager_base.ScriptedQOL.newNPCHelpers(scripts, maps)
 
@@ -435,15 +437,15 @@ def newStarters(monsters:MonsterManager, scripts:ScriptManager):
     randoMonsters = random.sample(range(180),3)
     for starter in randoMonsters:
         starterIndex = randoMonsters.index(starter)
-        monsters.monster[245+starterIndex].family = monsters.monster[starter].family
-        monsters.monster[245+starterIndex].ai = monsters.monster[starter].ai
-        monsters.monster[245+starterIndex].gfx= monsters.monster[starter].gfx
-        monsters.monster[245+starterIndex].npc = monsters.monster[starter].npc
-        monsters.monster[245+starterIndex].stats = monsters.monster[starter].stats
+        monsters.monster[245+starterIndex].family       = monsters.monster[starter].family
+        monsters.monster[245+starterIndex].ai           = monsters.monster[starter].ai
+        monsters.monster[245+starterIndex].gfx          = monsters.monster[starter].gfx
+        monsters.monster[245+starterIndex].npc          = monsters.monster[starter].npc
+        monsters.monster[245+starterIndex].stats        = monsters.monster[starter].stats
         monsters.monster[245+starterIndex].skillsLength = monsters.monster[starter].skillsLength
-        monsters.monster[245+starterIndex].skills = monsters.monster[starter].skills
-        monsters.monster[245+starterIndex].name = monsters.monster[starter].name
-        monsters.monster[245+starterIndex].goldIndex = monsters.monster[starter].goldIndex
+        monsters.monster[245+starterIndex].skills       = monsters.monster[starter].skills
+        monsters.monster[245+starterIndex].name         = monsters.monster[starter].name
+        monsters.monster[245+starterIndex].goldIndex    = monsters.monster[starter].goldIndex
 
         if monsters.monster[starter].dslevel < 10:
             hexLevel = 'FF FF' + f"{0xB0 + monsters.monster[starter].dslevel:02x}"
@@ -459,74 +461,19 @@ def newStarters(monsters:MonsterManager, scripts:ScriptManager):
         scripts.insertIntoScript(2, 21, pos, hexLevel)
 
 def worldShuffle(romData:mmap, maps:MapManager, scripts:ScriptManager, worlds:WorldManager, worldType:int):
-    warpScripts = {}
-    startaddr = worlds.WORLD_NAME_STARTADDR
-    warpNames = {}
-    scriptIndex = 0
-    teleCounter = 2
-    finalStore = list(worlds.finalStore.values())
-    worlds.magiCheckRedo(scripts, maps, worldType)
-    if worldType != 1:
-        maps.map[finalStore[0][1]].npcs[finalStore[0][2]][0] = 0x10
-        maps.map[finalStore[0][1]].npcs[finalStore[0][2]][1] = 0x1f
-        maps.map[finalStore[1][1]].npcs[finalStore[1][2]][0] = 0x10
-        maps.map[finalStore[1][1]].npcs[finalStore[1][2]][1] = 0x1f
-        if worldType == 3:
-            for k, v in worlds.world.items():
-                for x in finalStore:
-                    if x[0] == v.index:
-                        maps.map[x[1]].npcs[x[2]][0] = 0x00
-                        maps.map[x[1]].npcs[x[2]][1] = 0x0F
-                if v.scriptTeleportUnlockByte:
-                    scripts.main[v.scriptTeleportUnlockByte[0]][v.scriptTeleportUnlockByte[1]+2] = 0x0D
-    newWorldOrder = list(worlds.world.values())
+    shuffledEvents = list(worlds.gameEvents.values())
+    random.shuffle(shuffledEvents)
+    while shuffledEvents[0] == None:
+        random.shuffle(shuffledEvents)
+    newWorldOrder = {}
     if worldType == 2:
-        for world in newWorldOrder:
-            if world.teleportScripts:
-                for s in world.teleportScripts:
-                    warpScripts[s] = scripts.main[s]
-            if world.nameAddr:
-                for loc in world.nameAddr:
-                    name = []
-                    for x in range(0, 16):
-                       name.append(romData[loc+x])
-                    warpNames[loc] = name
-        random.shuffle(newWorldOrder)
-        for v in worlds.pillar.values():
-            gWorld = False
-            if newWorldOrder[0].isScript:
-                gWorld = True
-                trigger = [87,0]
-            elif newWorldOrder[0].doorIn > 255:
-                trigger = [newWorldOrder[0].doorIn-256, 6]
-            else:
-                trigger = [newWorldOrder[0].doorIn, 5]
-            maps.map[v.mapPillarID].triggers[v.doorInMapIndex] = trigger
-            maps.map[v.mapPillarID].triggers[v.mapPillarTriggerIndexPrism] = [newWorldOrder[0].prismScript ,0]
-            if v.doorOut > 255:
-                trigger = [v.doorOut - 256, 6]
-            else:
-                trigger = [v.doorOut, 5]
-            maps.map[newWorldOrder[0].mapID].triggers[newWorldOrder[0].doorOutMapIndex] = trigger
-            if gWorld == True:
-                maps.map[90].triggers[0] = trigger
-            if newWorldOrder[0].teleportScripts:
-                for s in newWorldOrder[0].teleportScripts:
-                    scripts.replaceScript(0, 99+scriptIndex, warpScripts[s].hex(" "))
-                    scriptIndex+=1
-            if newWorldOrder[0].nameAddr:
-                for loc in newWorldOrder[0].nameAddr:
-                    for x in range(0,16):
-                        romData[startaddr] = warpNames[loc][x]
-                        startaddr+=1
-            if newWorldOrder[0].scriptTeleportUnlockByte:
-                teleCounter+=newWorldOrder[0].scriptTeleportUnlockByte[2]
-                scripts.main[newWorldOrder[0].scriptTeleportUnlockByte[0]][newWorldOrder[0].scriptTeleportUnlockByte[1]+2] = teleCounter
-            for x in finalStore:
-                if x[0] == newWorldOrder[0].index:
-                    maps.map[x[1]].npcs[x[2]][0] = 0x10
-                    maps.map[x[1]].npcs[x[2]][1] = (v.order*16)+15
-            newWorldOrder.pop(0)
+        x = 0
+        for k in worlds.gameEvents.keys():
+            newWorldOrder[k] = shuffledEvents[x]
+            x += 1
+    else:
+        newWorldOrder = worlds.gameEvents
+    worlds.worldBuilder(scripts, maps, worldType, newWorldOrder)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

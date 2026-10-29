@@ -1,3 +1,4 @@
+from enum import Enum
 import mmap
 from FFL2R_utils import Utility
 
@@ -14,6 +15,13 @@ class ScriptManager:
         self.menu = self._populateBlock(rom, self.MENU_BLOCK[0], self.MENU_BLOCK[1], self.MENU_BLOCK[2], self.MENU_BLOCK[3])
         self.memo = self._populateBlock(rom, self.MEMO_BLOCK[0], self.MEMO_BLOCK[1], self.MEMO_BLOCK[2], self.MEMO_BLOCK[3], self.MEMO_BLOCK[4])
         self.banks = (self.main, self.battle, self.menu, self.memo)
+
+    class Bank(Enum):
+        MAIN = 0
+        BATTLE = 1
+        MENU = 2
+        MEMO = 3
+
 
     def _populateBlock(self, rom:mmap, startAddr:int, endAddr:int, offset:int, indexer:int, *memoAddr)->dict:
         d = {}

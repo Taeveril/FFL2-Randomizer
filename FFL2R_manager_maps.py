@@ -171,6 +171,7 @@ class MapManager:
 
         def info(self):
             print(f"""
+            Index:          {self.index}
             Addr:           {hex(self.addr)}
             Map:            {self.map}
             X:              {self.x}

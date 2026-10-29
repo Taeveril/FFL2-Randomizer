@@ -1,6 +1,7 @@
 FFLegend 2 Variables + States
 By: Taeveril
 https://github.com/Taeveril/FFL2-Randomizer
+Ver 2 (10/29/26) - Added additional comment about Var13.
 Ver 1 (08/24/25) - Initial findings
 
 
@@ -186,7 +187,7 @@ Maps w/ NPCs:	174, 187
 
 Var Number:		13
 Purpose:		Central Pillar Tracking
-Comments:
+Comments:		Setting this variable to greater than 8 turns off all random encounters.
 Maps w/ NPCs:	192, 197, 200, 201
 States:
 0 - Off:
