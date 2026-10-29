@@ -26,7 +26,7 @@
     - Mutant stat growth behaves as expected.
     - Dooring/Pegasus/Teleporting during the race will now force a dismount.
 
-## Version 3.3.0 (7/25/2026):
+## Version 3.3.0 (10/29/2026):
 - World Shuffle has been reworked to use "key" items that unblock progression.
 - Final Store will now always appear after clearing a world.
 
